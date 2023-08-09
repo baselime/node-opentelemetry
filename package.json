@@ -1,0 +1,42 @@
+{
+  "name": "@baselime/node-opentelemetry",
+  "version": "0.1.0",
+  "description": "Instrument node.js applications with open telemetry ",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/index.map.js"
+  ],
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@opentelemetry/exporter-trace-otlp-http": "^0.41.2",
+    "@opentelemetry/instrumentation": "^0.41.2",
+    "@opentelemetry/resource-detector-aws": "^1.3.0",
+    "@opentelemetry/resources": "^1.15.2",
+    "@opentelemetry/sdk-node": "^0.41.2",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.1.6"
+  },
+  "scripts": {
+    "build:sdk": "esbuild src/index.ts --bundle --sourcemap --target=node18 --platform=node --outfile=dist/index.js",
+    "build:types": "tsc src/index.ts --declaration --emitDeclarationOnly --outDir dist",
+    "build": "npm run build:types & npm run build:sdk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baselime/node-opentelemetry.git"
+  },
+  "keywords": [
+    "baselime",
+    "otel",
+    "opentelemetry",
+    "tracing",
+    "node.js"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/baselime/node-opentelemetry/issues"
+  },
+  "homepage": "https://github.com/baselime/node-opentelemetry#readme"
+}
