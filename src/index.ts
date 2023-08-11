@@ -1,5 +1,5 @@
 import { NodeSDK } from '@opentelemetry/sdk-node'
-import { detectResourcesSync } from '@opentelemetry/resources';
+import { detectResourcesSync, Resource } from '@opentelemetry/resources';
 import { awsEc2Detector, awsEcsDetector } from '@opentelemetry/resource-detector-aws'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
@@ -7,17 +7,34 @@ import { InstrumentationOption } from '@opentelemetry/instrumentation';
 type BaselimeSDKOpts = {
     instrumentations: InstrumentationOption[],
     collectorUrl?: string,
-    baselimeKey?: string
+    baselimeKey?: string,
+    service?: string,
+    namespace?: string,
 }
 
-const resource =  detectResourcesSync({
+const resource = detectResourcesSync({
     detectors: [awsEcsDetector, awsEc2Detector],
 });
 
 enum CompressionAlgorithm {
-	GZIP = "gzip",
+    GZIP = "gzip",
 }
 
+/**
+ * BaselimeSDK helps to instrument your container applications
+ * 
+ * ```javascript
+ * import { BaselimeSDK } from '@baselime/node-opentelemetry';
+ * 
+ * const sdk = new BaselimeSDK({ instrumentations: [...]});
+ * 
+ * sdk.start();
+ * ```
+ * 
+ * Add the instrumentations you want from https://.......
+ * 
+ * Then add your BASELIME_KEY as an environment variable and start sending data.
+ */
 export class BaselimeSDK extends NodeSDK {
     constructor(opts: BaselimeSDKOpts) {
 
@@ -25,17 +42,24 @@ export class BaselimeSDK extends NodeSDK {
 
         const key = opts.baselimeKey || process.env.BASELIME_KEY;
 
-        if(!key) {
+        if (!key) {
             throw Error(`Please ensure that the BASELIME_KEY environment variable is set.`)
         }
 
+        if (opts.service) {
+            resource.merge(new Resource({ '$baselime.service': opts.service }));
+        }
+
+        if (opts.namespace) {
+            resource.merge(new Resource({ '$baselime.namespace': opts.namespace }))
+        }
         super({
             resource,
             traceExporter: new OTLPTraceExporter({
                 url: collectorURL,
                 compression: CompressionAlgorithm.GZIP,
                 headers: {
-                    "x-api-key": process.env.BASELIME_KEY,
+                    "x-api-key": key,
                 },
             }),
             instrumentations: [...opts.instrumentations]

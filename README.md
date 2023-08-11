@@ -1,4 +1,4 @@
-# Lambda Node OpenTelemetry
+# Node OpenTelemetry
 
 
 ## QuickStart
@@ -9,7 +9,7 @@ Install the dependencies
 npm i --save-dev @baselime/node-opentelemetry @opentelemetry/auto-instrumentations-node
 ```
 
-Add the tracing JS file
+Create a tracing JS file
 
 ```javascript
 // tracing.js
@@ -36,6 +36,6 @@ update the production start script in your package.json
 ```
 {
     "scripts": {
-        "start": "BASELIME_KEY=<secret key> OTEL_SERVICE_NAME=<service name> node -r ./tracing.js <main_file>.js"
+        "start": "BASELIME_KEY=<secret key> node -r ./tracing.js <main_file>.js"
     }
 }
