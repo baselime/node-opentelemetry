@@ -3,16 +3,18 @@
 
 ## QuickStart
 
+Get started with Open Telemetry for containers on baselime
+
 Install the dependencies
 
 ```bash
 npm i --save-dev @baselime/node-opentelemetry @opentelemetry/auto-instrumentations-node
 ```
 
-Create a tracing JS file
+Create a tracing JS file to your src directory
 
 ```javascript
-// tracing.js
+// tracing.cjs
 import { BaselimeSDK } from '@baselime/node-opentelemetry';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
@@ -26,16 +28,28 @@ const sdk = new BaselimeSDK({
 sdk.start();
 ```
 
-Ensure this file is included in your docker image and that the BASELIME_KEY environment variable is set
+Add this environment variable to your Dockerfile to load the tracing configuration
 
 ```bash
-env BASELIME_KEY <secret key>
+ENV NODE_OPTIONS="-r ./src/tracing.cjs"
 ```
 
-update the production start script in your package.json
-```
-{
-    "scripts": {
-        "start": "BASELIME_KEY=<secret key> node -r ./tracing.js <main_file>.js"
+In your SST construct add the Baselime key environment variable
+
+```javascript
+import { StackContext, Service } from "sst/constructs";
+import { StringParameter } from 'aws-cdk-lib/aws-ssm'
+export function API({ stack }: StackContext) {
+
+  const service = new Service(stack, 'sst-service', {
+    path: './',
+    environment: {
+      BASELIME_KEY: StringParameter.valueForStringParameter(stack, 'baselime-key')
     }
+  });
+
+  stack.addOutputs({
+    URL: service.url
+  })
 }
+```
