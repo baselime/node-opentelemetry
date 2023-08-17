@@ -24,6 +24,18 @@ export function Container({ stack }: StackContext) {
     cpu: 256,
     taskImageOptions: {
       image: ecs.ContainerImage.fromDockerImageAsset(asset),
+      logDriver: new ecs.FireLensLogDriver({
+        options: {
+          "Name": "http",
+          "Host": "ecs-logs-ingest.baselime.cc",
+          "Port": "443",
+          "TLS": "on",
+          "format": "json",
+          "retry_limit": "2",
+          "header": `x-api-key ${StringParameter.valueForStringParameter(stack, 'baselime-key')}`,
+        },
+      }),
+      enableLogging: true,
       environment: {
         BASELIME_KEY: StringParameter.valueForStringParameter(stack, 'baselime-key'),
         PORT: '80'
@@ -34,8 +46,8 @@ export function Container({ stack }: StackContext) {
     loadBalancerName: 'fargate-express-sst',
     maxHealthyPercent: 200,
     minHealthyPercent: 100,
-
   });
+
 
   loadBalancedFargateService.targetGroup.configureHealthCheck({
     healthyThresholdCount: 2,

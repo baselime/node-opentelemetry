@@ -1,14 +1,14 @@
 import { SSTConfig } from "sst";
-import { Container } from "./stacks/MyStack";
+import { API } from "./stacks/MyStack";
 
 export default {
   config(_input) {
     return {
-      name: "fargate-express-sst",
-      region: "eu-west-1",
+      name: "sst-service",
+      region: "eu-west-2",
     };
   },
   stacks(app) {
-    app.stack(Container);
+    app.stack(API);
   }
 } satisfies SSTConfig;

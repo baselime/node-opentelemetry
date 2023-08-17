@@ -1,0 +1,29 @@
+{
+  "name": "sst-service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^16.1.0",
+    "aws-cdk-lib": "2.84.0",
+    "constructs": "10.1.156",
+    "sst": "^2.24.7",
+    "typescript": "^5.1.6"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@baselime/node-opentelemetry": "^0.1.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.39.1",
+    "express": "^4.18.2"
+  }
+}
