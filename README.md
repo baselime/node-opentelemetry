@@ -28,10 +28,10 @@ const sdk = new BaselimeSDK({
 sdk.start();
 ```
 
-Add this environment variable to your Dockerfile to load the tracing configuration
+Add this environment variable to your Dockerfile to load the tracing configuration and enable tracing of ESM imports
 
 ```bash
-ENV NODE_OPTIONS="-r ./src/tracing.cjs"
+ENV NODE_OPTIONS="-r ./src/tracing.cjs --experimental-loader=import-in-the-middle/hook.mjs"
 ```
 
 In your SST construct add the Baselime key environment variable
