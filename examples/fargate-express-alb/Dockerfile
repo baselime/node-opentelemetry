@@ -12,7 +12,6 @@ RUN npm install --ci --omit=dev
 # Copy the rest of the application code to the working directory
 COPY src src
 
-ENV NODE_OPTIONS="-r ./src/tracing.js"
 # Expose the port your app will listen on
 EXPOSE 80
 

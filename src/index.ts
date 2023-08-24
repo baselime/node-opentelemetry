@@ -21,37 +21,33 @@ enum CompressionAlgorithm {
 }
 
 /**
- * BaselimeSDK helps to instrument your container applications
+ * BaselimeSDK is a wrapper around the OpenTelemetry NodeSDK that configures it to send traces to Baselime.
  * 
- * ```javascript
- * import { BaselimeSDK } from '@baselime/node-opentelemetry';
+ * @param {BaselimeSDKOpts} options
+ * @param {InstrumentationOption[]} options.instrumentations - The OpenTelemetry instrumentations to enable.
+ * @param {string} options.collectorUrl - The URL of the Baselime collector. Defaults to https://otel.baselime.io/v1
+ * @param {string} options.baselimeKey - The Baselime API key. Defaults to the BASELIME_KEY environment variable.
+ * @param {string} options.service - The name of the service. 
+ * @param {string} options.namespace - The namespace of the service.
  * 
- * const sdk = new BaselimeSDK({ instrumentations: [...]});
- * 
- * sdk.start();
- * ```
- * 
- * Add the instrumentations you want from https://.......
- * 
- * Then add your BASELIME_KEY as an environment variable and start sending data.
  */
 export class BaselimeSDK extends NodeSDK {
-    constructor(opts: BaselimeSDKOpts) {
+    constructor(options: BaselimeSDKOpts) {
 
-        const collectorURL = opts.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
+        const collectorURL = options.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
 
-        const key = opts.baselimeKey || process.env.BASELIME_KEY;
+        const key = options.baselimeKey || process.env.BASELIME_KEY;
 
         if (!key) {
             throw Error(`Please ensure that the BASELIME_KEY environment variable is set.`)
         }
 
-        if (opts.service) {
-            resource.merge(new Resource({ '$baselime.service': opts.service }));
+        if (options.service) {
+            resource.merge(new Resource({ '$baselime.service': options.service }));
         }
 
-        if (opts.namespace) {
-            resource.merge(new Resource({ '$baselime.namespace': opts.namespace }))
+        if (options.namespace) {
+            resource.merge(new Resource({ '$baselime.namespace': options.namespace }))
         }
         super({
             resource,
@@ -62,7 +58,7 @@ export class BaselimeSDK extends NodeSDK {
                     "x-api-key": key,
                 },
             }),
-            instrumentations: [...opts.instrumentations]
+            instrumentations: [...options.instrumentations]
         })
     }
 }

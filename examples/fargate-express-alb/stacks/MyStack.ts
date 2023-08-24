@@ -16,7 +16,6 @@ export function Container({ stack }: StackContext) {
     directory: './',
   });
 
-  // Create a task definition
   const loadBalancedFargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(stack, 'Service', {
     cluster,
     memoryLimitMiB: 512,
@@ -38,7 +37,8 @@ export function Container({ stack }: StackContext) {
       enableLogging: true,
       environment: {
         BASELIME_KEY: StringParameter.valueForStringParameter(stack, 'baselime-key'),
-        PORT: '80'
+        PORT: '80',
+        NODE_OPTIONS: '-r ./src/tracing.cjs',
       }
     },
     publicLoadBalancer: true,

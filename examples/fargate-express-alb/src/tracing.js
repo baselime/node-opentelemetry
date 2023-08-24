@@ -3,7 +3,6 @@ const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumenta
 
 
 const sdk = new BaselimeSDK({
-  collectorUrl: 'https://otel.baselime.cc/v1',
   instrumentations: [    
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-http': {
