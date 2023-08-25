@@ -4,7 +4,8 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 
 export function API({ stack }: StackContext) {
   const key = StringParameter.valueForStringParameter(stack, 'baselime-key');
-  
+
+
   const service = new Service(stack, 'sst-service', {
     path: './',
     environment: {
@@ -27,7 +28,7 @@ export function API({ stack }: StackContext) {
       }
     }
   });
-
+  
   stack.addOutputs({
     URL: service.url
   })

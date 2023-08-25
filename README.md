@@ -1,6 +1,6 @@
-# BaselimeSDK for Open Telemetry and Node.js
+# BaselimeSDK for OpenTelemetry and Node.js
 
-Ship your Open Telemetry traces to Baselime. It makes getting started with a custom trace configuration and Baselime simpler.
+Ship your OpenTelemetry traces to Baselime. It makes getting started with a custom trace configuration and Baselime simpler and works with any Node.js application.
 
 ![A trace from an ECS task](./traces.png)
 
