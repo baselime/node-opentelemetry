@@ -5,21 +5,21 @@
   "type": "module",
   "files": [
     "dist/index.js",
-    "dist/index.d.ts",
-    "dist/index.map.js"
+    "dist/index.d.ts"
   ],
   "main": "dist/index.js",
   "devDependencies": {
+    "@release-it/keep-a-changelog": "^4.0.0",
     "@types/node": "^20.8.6",
     "esbuild": "^0.19.4",
     "mockttp": "^3.9.4",
+    "release-it": "^16.2.1",
+    "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
   },
   "scripts": {
-    "build:sdk": "esbuild src/index.ts --bundle --sourcemap --target=node18 --platform=node --outfile=dist/index.js",
-    "build:types": "tsc src/index.ts --declaration --sourcemap --outDir dist",
-    "build": "npm run build:types & npm run build:sdk",
+    "build": "tsup",
     "test": "vitest"
   },
   "repository": {

@@ -1,9 +1,11 @@
-import { NodeSDK } from '@opentelemetry/sdk-node'
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-node'
+import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-node'
 import { detectResourcesSync, Resource, ResourceAttributes } from '@opentelemetry/resources';
-import { awsEc2Detector, awsEcsDetector } from '@opentelemetry/resource-detector-aws'
+import { awsEc2Detector, awsEcsDetector, awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { InstrumentationOption } from '@opentelemetry/instrumentation';
+import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation';
+import { existsSync } from 'fs';
+import { arch } from 'os';
+import { register } from 'module';
 
 type BaselimeSDKOpts = {
     instrumentations?: InstrumentationOption[],
@@ -27,18 +29,19 @@ type BaselimeSDKOpts = {
  * @param {boolean} options.serverless - Whether or not the service is running in a serverless environment. Defaults to false.
  * 
  */
-export class BaselimeSDK extends NodeSDK {
+export class BaselimeSDK {
+    options: BaselimeSDKOpts;
+    attributes: ResourceAttributes;
     constructor(options: BaselimeSDKOpts) {
         options.serverless = options.serverless || false;
         options.collectorUrl = options.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
         options.baselimeKey = options.baselimeKey || process.env.BASELIME_KEY
-
         if (!options.baselimeKey) {
             throw Error(`Please ensure that the BASELIME_KEY environment variable is set.`)
         }
 
         let attributes: ResourceAttributes = detectResourcesSync({
-            detectors: [awsEcsDetector, awsEc2Detector],
+            detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector],
         }).attributes;
 
         if (options.service) {
@@ -49,18 +52,46 @@ export class BaselimeSDK extends NodeSDK {
             attributes['$baselime.namespace'] = options.namespace
         }
 
-        const exporter = new OTLPTraceExporter({
-            url: options.collectorUrl,
-            headers: {
-                "x-api-key": options.baselimeKey,
-            },
-        })
+        this.attributes = attributes
+        this.options = options;
+    }
 
-        super({
-            resource: new Resource(attributes),
-            spanProcessor: options.serverless ? new SimpleSpanProcessor(exporter) : undefined,
-            traceExporter: !options.serverless ? exporter : undefined,
-            instrumentations: [...options.instrumentations || []]
-        })
+    start() {
+        let collectorUrl = this.options.collectorUrl;
+
+        const provider = new NodeTracerProvider({
+            resource: new Resource({
+                ...this.attributes
+            }),
+            forceFlushTimeoutMillis: 500,
+        });
+
+
+
+        // If the baselime extension is running, we need to use the sandbox collector.
+        if (existsSync('/opt/extensions/baselime')) {
+            collectorUrl = 'http://sandbox:4323/otel';
+        }
+
+        const exporter = new OTLPTraceExporter({
+            url: collectorUrl,
+            headers: {
+                "x-api-key": this.options.baselimeKey || process.env.BASELIME_KEY || process.env.BASELIME_OTEL_KEY,
+            },
+        });
+
+        const spanProcessor = this.options.serverless ? new SimpleSpanProcessor(exporter) : new BatchSpanProcessor(exporter, {
+            maxQueueSize: 100,
+            maxExportBatchSize: 5,
+        });
+
+        provider.addSpanProcessor(spanProcessor);
+        provider.register();
+
+        registerInstrumentations({
+            instrumentations: [
+                ...this.options.instrumentations || []
+            ]
+        });
     }
 }
