@@ -20,7 +20,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest"
+    "test": "vitest",
+    "release": "release-it"
   },
   "repository": {
     "type": "git",
