@@ -5,8 +5,14 @@
   "type": "module",
   "files": [
     "dist/index.js",
-    "dist/index.d.ts"
+    "dist/index.d.ts",
+    "dist/index.cjs",
+    "dist/index.d.cjs"
   ],
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "main": "dist/index.js",
   "devDependencies": {
     "@release-it/keep-a-changelog": "^4.0.0",

@@ -6,7 +6,7 @@ export default defineConfig({
   sourcemap: false,
   dts: true,
   clean: true,
-  format: ['esm'],
+  format: ['esm', 'cjs'],
   target: 'node18',
   noExternal: [/^@opentelemetry\//, /^@baselime\//],
   metafile: true,
