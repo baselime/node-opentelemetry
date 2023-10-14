@@ -2,6 +2,10 @@ import { StackContext, Service } from "sst/constructs";
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 
+function addLoggingConfig(service: Service, key: string) {
+  console.log(service.node.children)
+
+}
 export function API({ stack }: StackContext) {
   const key = StringParameter.valueForStringParameter(stack, 'baselime-key');
 
@@ -28,7 +32,8 @@ export function API({ stack }: StackContext) {
       }
     }
   });
-  
+
+  addLoggingConfig(service, key)
   stack.addOutputs({
     URL: service.url
   })
