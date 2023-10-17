@@ -3,7 +3,10 @@
   "version": "0.2.2",
   "description": "Instrument node.js applications with open telemetry ",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@release-it/keep-a-changelog": "^4.0.0",
     "@types/node": "^20.8.6",
@@ -15,7 +18,7 @@
     "vitest": "^0.34.6"
   },
   "scripts": {
-    "build": "tsup && cp -r ./dist/** .",
+    "build": "tsup",
     "test": "vitest",
     "release": "release-it"
   },
