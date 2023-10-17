@@ -6,16 +6,6 @@
   "files": [
     "dist/**"
   ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "trpc": {
-      "import": "./dist/trpc.js",
-      "require": "./dist/trpc.cjs"
-    }
-  },
   "main": "dist/index.js",
   "devDependencies": {
     "@release-it/keep-a-changelog": "^4.0.0",
@@ -28,7 +18,7 @@
     "vitest": "^0.34.6"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp -r ./dist/** .",
     "test": "vitest",
     "release": "release-it"
   },

@@ -128,3 +128,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+./index.cjs
+./index.js
+./index.d.ts
+./index.d.cts
+
+./trpc.cjs
+./trpc.js
+./trpc.d.ts
+./trpc.d.cts

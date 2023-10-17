@@ -8,5 +8,6 @@ export default defineConfig({
   clean: true,
   format: ['esm', 'cjs'],
   target: 'node18',
-  noExternal: [/^@opentelemetry\//, /^@baselime\//, /^@trpc\/server/, /^flat/]
+  noExternal: [/^@opentelemetry\//, /^@baselime\//, /^@trpc\/server/, /^flat/],
+  minify: true,
 })
