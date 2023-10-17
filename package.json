@@ -1,19 +1,19 @@
 {
   "name": "@baselime/node-opentelemetry",
-  "version": "0.2.2-experimental",
+  "version": "0.2.1",
   "description": "Instrument node.js applications with open telemetry ",
   "type": "module",
   "files": [
     "dist/**"
   ],
   "exports": {
-    "import": {
-      "index": "./dist/index.js",
-      "trpc": "./dist/trpc.js"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "require": {
-      "index": "./dist/index.cjs",
-      "trpc": "./dist/trpc.cjs"
+    "trpc": {
+      "import": "./dist/trpc.js",
+      "require": "./dist/trpc.cjs"
     }
   },
   "main": "dist/index.js",
