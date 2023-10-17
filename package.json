@@ -3,10 +3,7 @@
   "version": "0.2.2-0",
   "description": "Instrument node.js applications with open telemetry ",
   "type": "module",
-  "files": [
-    "dist/**"
-  ],
-  "main": "dist/index.js",
+  "main": "index.js",
   "devDependencies": {
     "@release-it/keep-a-changelog": "^4.0.0",
     "@types/node": "^20.8.6",

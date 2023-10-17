@@ -1,6 +1,7 @@
 import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-node'
 import { detectResourcesSync, Resource, ResourceAttributes } from '@opentelemetry/resources';
 import { awsEc2Detector, awsEcsDetector, awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
+import { VercelDetector } from './resources/vercel.js';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation';
 import { existsSync } from 'fs';
@@ -39,11 +40,12 @@ export class BaselimeSDK {
         }
 
         let attributes: ResourceAttributes = detectResourcesSync({
-            detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector],
+            detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector()],
         }).attributes;
-
+    
         if (options.service) {
             attributes['$baselime.service'] = options.service
+            attributes['service.name'] = options.service
         }
 
         if (options.namespace) {
