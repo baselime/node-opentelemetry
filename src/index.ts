@@ -4,8 +4,6 @@ import { awsEc2Detector, awsEcsDetector, awsLambdaDetector } from '@opentelemetr
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation';
 import { existsSync } from 'fs';
-import { arch } from 'os';
-import { register } from 'module';
 
 type BaselimeSDKOpts = {
     instrumentations?: InstrumentationOption[],
