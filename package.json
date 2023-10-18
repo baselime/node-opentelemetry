@@ -1,6 +1,6 @@
 {
   "name": "@baselime/node-opentelemetry",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Instrument node.js applications with open telemetry ",
   "type": "module",
   "main": "dist/index.js",
@@ -52,6 +52,7 @@
     "@opentelemetry/sdk-node": "^0.44.0",
     "@opentelemetry/sdk-trace-node": "^1.17.1",
     "@trpc/server": "^10.40.0",
-    "flat": "^6.0.1"
+    "flat": "^6.0.1",
+    "undici": "^5.26.3"
   }
 }
