@@ -29,7 +29,7 @@ function captureBody(request: ClientRequest): Promise<string> {
 
 export function betterHttpInstrumentation (options: BetterHttpInstrumentationOptions) {
     return {
-        requestHook (span: Span, request: ClientRequest | IncomingHttpHeaders) {
+        requestHook (span: Span, request: ClientRequest | IncomingMessage) {
             if (request instanceof ClientRequest) {
                 const plugin = options.plugins.find(plugin => plugin.shouldParseRequest && plugin.shouldParseRequest(request));
 
