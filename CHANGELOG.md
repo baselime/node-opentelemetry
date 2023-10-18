@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+## [Unreleased]
 
+- http plugin format
+  
 ## [0.2.5] - 2023-10-18
 
 - fix npm package exports for cjs
