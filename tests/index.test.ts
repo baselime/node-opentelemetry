@@ -39,6 +39,7 @@ describe("Test BaselimeSDK for opentelemetry", async () => {
 
         const { resourceSpans: [serialisedSpan]} = getSpans(request)
 
+        console.log(JSON.stringify(serialisedSpan, null, 2))
         expect(serialisedSpan.resource.attributes.find((attr) => attr.key === "$baselime.service")?.value.stringValue).toBe("my_service");
         expect(serialisedSpan.resource.attributes.find((attr) => attr.key === "$baselime.namespace")?.value.stringValue).toBe("my_namespace")
     })
