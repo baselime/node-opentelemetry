@@ -1,16 +1,15 @@
-import { ClientRequest, IncomingHttpHeaders, IncomingMessage, ServerResponse } from "http";
-import { Plugin } from "./plugin.ts";
+import { ClientRequest, IncomingMessage } from "http";
+import { HttpPlugin } from "./plugin.ts";
 
-export const VercelPlugin: Plugin = {
-    name: 'vercel',
+export class VercelPlugin extends HttpPlugin implements HttpPlugin {
+    name = 'vercel';
     shouldParseRequest(request: ClientRequest | IncomingMessage): boolean {
-       
+
         if (request instanceof IncomingMessage && request.headers['x-vercel-id']) {
             return true;
         }
         return false;
-    },
-
+    }
     parseIncommingMessage(request: IncomingMessage) {
 
         const headers = request.headers;

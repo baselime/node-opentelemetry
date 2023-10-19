@@ -8,6 +8,7 @@ export default defineConfig({
   clean: true,
   format: ['esm', 'cjs'],
   target: 'node18',
-  noExternal: [/^.*/],
   minify: false,
+  // for now we include flat in the bundle because it is not exported correctly for both esm and cjs
+  noExternal: [/flat/],
 })

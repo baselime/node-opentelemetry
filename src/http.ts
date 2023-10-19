@@ -1,38 +1,31 @@
 import { Span } from "@opentelemetry/api";
-import { ClientRequest, IncomingHttpHeaders, IncomingMessage } from "http";
-import { Plugin } from "./http-plugins/plugin.ts";
+import { ClientRequest, IncomingMessage } from "http";
+import { HttpPlugin } from "./http-plugins/plugin.ts";
 import { flatten } from "flat";
+import { HttpInstrumentation, HttpInstrumentationConfig } from "@opentelemetry/instrumentation-http";
+import { captureBody } from "./http-plugins/captureBody.ts";
+import { StripePlugin } from "./index.ts";
 
 
 type BetterHttpInstrumentationOptions = {
-    plugins: Plugin[],
+    plugins?: HttpPlugin[],
+    requestHook?: HttpInstrumentationConfig['requestHook']
+    responseHook?: HttpInstrumentationConfig['responseHook']
+    ignoreIncomingRequestHook?: HttpInstrumentationConfig['ignoreIncomingRequestHook']
+    ignoreOutgoingRequestHook?: HttpInstrumentationConfig['ignoreOutgoingRequestHook']
+    startIncomingSpanHook?: HttpInstrumentationConfig['startIncomingSpanHook']
+    startOutgoingSpanHook?: HttpInstrumentationConfig['startOutgoingSpanHook']
 }
 
-function captureBody(request: ClientRequest): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const chunks: string[] = [];
-        const oldWrite = request.write.bind(request);
-        const oldEnd = request.end.bind(request);
-        request.on('data', chunk => {
-            chunks.push(decodeURIComponent(chunk.toString()))
-            return oldWrite(chunk);
-        });
-        request.on('end', (chunk) => {
-            if (chunk) {
-                chunks.push(decodeURIComponent(chunk.toString()));
-            }
-            oldEnd(chunk);
-            return resolve(chunks.join(''))
-        });
-    });
-}
-
-export function betterHttpInstrumentation (options: BetterHttpInstrumentationOptions) {
+export function _betterHttpInstrumentation (options: BetterHttpInstrumentationOptions = {}) {
+    options.plugins = options.plugins || [];
     return {
         requestHook (span: Span, request: ClientRequest | IncomingMessage) {
             if (request instanceof ClientRequest) {
                 const plugin = options.plugins.find(plugin => plugin.shouldParseRequest && plugin.shouldParseRequest(request));
-
+                
+                span.setAttribute('http.plugin.name', plugin.name);
+                
                 if (plugin.captureBody) {
                     captureBody(request).then(body => {
                         span.setAttributes(flatten({ body }));
@@ -49,7 +42,24 @@ export function betterHttpInstrumentation (options: BetterHttpInstrumentationOpt
                     span.setAttributes(flatten(attributes));
                 }
             }
-        }
+
+            if(options.requestHook) {
+                options.requestHook(span, request);
+            }
+        },
+        
     }
 }
-        
+
+export class BetterHttpInstrumentation extends HttpInstrumentation {
+    constructor(options: BetterHttpInstrumentationOptions = {}) {
+        super({
+            ..._betterHttpInstrumentation(options),
+            responseHook: options.responseHook,
+            ignoreIncomingRequestHook: options.ignoreIncomingRequestHook,
+            ignoreOutgoingRequestHook: options.ignoreOutgoingRequestHook,
+            startIncomingSpanHook: options.startIncomingSpanHook,
+            startOutgoingSpanHook: options.startOutgoingSpanHook,
+        })
+    }
+}
