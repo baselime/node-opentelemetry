@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+- Improve service and namespace detection for vercel
+  
 ## [0.2.7] - 2023-10-19
 
 - Better Plugin api

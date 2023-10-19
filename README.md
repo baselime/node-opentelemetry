@@ -8,6 +8,7 @@ Ship your OpenTelemetry traces to Baselime. It makes getting started with a cust
 - Next.js
 - TRPC
 - AWS
+  
 ## Getting Started 
 
 To find out how to configure the BaselimeSDK for container runtimes checkout the [baselime docs](https://baselime.io/docs/sending-data/opentelemetry/node.js/containers/)
