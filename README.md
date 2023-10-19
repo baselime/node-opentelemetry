@@ -1,17 +1,16 @@
-# BaselimeSDK for OpenTelemetry and Node.js
+# Node.js Baselime OpenTelemetry SDK
+[![Documentation][docs_badge]][docs]
+[![Latest Release][release_badge]][release]
+[![License][license_badge]][license]
 
-Ship your OpenTelemetry traces to Baselime. It makes getting started with a custom trace configuration and Baselime simpler and works with any Node.js application.
+Instrument your Node.js applications with OpenTelemetry and send the traces to [Baselime](https://baselime.io).
 
-![A trace from an ECS task](./traces.png)
+![](./traces.png)
 
-## Supported Service
-- Next.js
-- TRPC
-- AWS
   
 ## Getting Started 
 
-To find out how to configure the BaselimeSDK for container runtimes checkout the [baselime docs](https://baselime.io/docs/sending-data/opentelemetry/node.js/containers/)
+Check out the [documentation](https://baselime.io/docs/sending-data/opentelemetry/).
 
 ## Example
 
@@ -41,3 +40,19 @@ The BaselimeSDK class takes the following configuration options
 | service          | string (optional)       | The service name.                    |
 | namespace        | string (optional)       | The namespace.                       |
 
+## License
+
+&copy; Baselime Limited, 2023
+
+Distributed under MIT License (`The MIT License`).
+
+See [LICENSE](LICENSE) for more information.
+
+<!-- Badges -->
+
+[docs]: https://baselime.io/docs/
+[docs_badge]: https://img.shields.io/badge/docs-reference-blue.svg?style=flat-square
+[release]: https://github.com/baselime/node-opentelemetry/releases/latest
+[release_badge]: https://img.shields.io/github/release/baselime/node-opentelemetry.svg?style=flat-square&ghcache=unused
+[license]: https://opensource.org/licenses/MIT
+[license_badge]: https://img.shields.io/github/license/baselime/node-opentelemetry.svg?color=blue&style=flat-square&ghcache=unused
