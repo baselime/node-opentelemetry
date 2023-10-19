@@ -13,6 +13,13 @@ export class VercelDetector implements DetectorSync {
             return Resource.empty();
         }
 
+        const deploymentUrl = String(process.env.VERCEL_URL);
+
+        if (!deploymentUrl) {
+            return Resource.empty();
+        }
+
+       
         const attributes = {
             [SemanticResourceAttributes.CLOUD_PROVIDER]: String(
                 'Vercel'
@@ -28,6 +35,17 @@ export class VercelDetector implements DetectorSync {
             'vercel.git.commit': String(process.env.VERCEL_GIT_COMMIT_SHA),
             'vercel.git.message': String(process.env.VERCEL_GIT_COMMIT_MESSAGE),
             'vercel.git.author': String(process.env.VERCEL_GIT_COMMIT_AUTHOR_NAME)
+        }
+
+        const gitBranchUrl = String(process.env.VERCEL_BRANCH_URL);
+        
+        if(gitBranchUrl) {
+            try { 
+                let serviceName = gitBranchUrl.split('-git-')[0]
+                attributes['service.name'] = serviceName;
+                attributes['service.namespace'] = serviceName;
+            } catch(e) {
+            }
         }
         return new Resource(attributes);
     }

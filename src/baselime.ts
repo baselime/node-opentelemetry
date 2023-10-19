@@ -5,7 +5,6 @@ import { VercelDetector } from './resources/vercel.ts';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation';
 import { existsSync } from 'fs';
-import { BaselimeDetector } from './resources/baselime.ts';
 
 type BaselimeSDKOpts = {
     instrumentations?: InstrumentationOption[],
@@ -50,7 +49,7 @@ export class BaselimeSDK {
 
         const provider = new NodeTracerProvider({
             resource: detectResourcesSync({
-                detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector(), new BaselimeDetector(this.options)],
+                detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector()],
             }),
             forceFlushTimeoutMillis: 500,
         });
