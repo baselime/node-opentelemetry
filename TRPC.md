@@ -1,6 +1,6 @@
 # TRPC OpenTelemetry Middleware
 
-Trace your TRPC Applications. If you don't use OpenTelemetry yet please see https://baselime.io/docs/sending-data/opentelemetry
+Trace your TRPC Applications. If you don't use OpenTelemetry yet please see [The Baselime Docs](https://baselime.io/docs/sending-data/opentelemetry)
 
 ![Trace TRPC](trpc.png)
 
