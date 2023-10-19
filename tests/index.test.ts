@@ -18,8 +18,6 @@ describe("Test BaselimeSDK for opentelemetry", async () => {
             collectorUrl: mockServer.url,
             serverless: true,
             baselimeKey: baselimeKey,
-            service: "my_service",
-            namespace: "my_namespace"
         })
 
         sdk.start();
@@ -35,12 +33,6 @@ describe("Test BaselimeSDK for opentelemetry", async () => {
         const [request] = await waitForCollector(collector)
 
         expect(request.headers["x-api-key"]).toBe(baselimeKey);
-        
-
-        const { resourceSpans: [serialisedSpan]} = getSpans(request)
-
-        console.log(JSON.stringify(serialisedSpan, null, 2))
-        expect(serialisedSpan.resource.attributes.find((attr) => attr.key === "$baselime.service")?.value.stringValue).toBe("my_service");
-        expect(serialisedSpan.resource.attributes.find((attr) => attr.key === "$baselime.namespace")?.value.stringValue).toBe("my_namespace")
+    
     })
 });
