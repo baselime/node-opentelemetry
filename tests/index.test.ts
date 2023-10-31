@@ -33,6 +33,5 @@ describe("Test BaselimeSDK for opentelemetry", async () => {
         const [request] = await waitForCollector(collector)
 
         expect(request.headers["x-api-key"]).toBe(baselimeKey);
-    
     })
 });
