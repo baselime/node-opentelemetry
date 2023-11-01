@@ -81,5 +81,6 @@ export class BaselimeSDK {
                 ...this.options.instrumentations || []
             ]
         });
+        return provider;
     }
 }

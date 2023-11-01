@@ -1,67 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, test } from "vitest";
 import { captureBody } from "../src/http-plugins/captureBody";
-import { getLocal, completionCheckers, MockedEndpoint, CompletedRequest } from 'mockttp';
+import { getLocal } from 'mockttp';
 import { URL } from "url";
-import { Client } from "undici";
 import { BaselimeSDK } from "../src";
 import { trace } from "@opentelemetry/api";
 import { waitForCollector } from "./utils/otel";
 import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
+import { Client } from "undici";
 import { ClientRequest } from "http";
 
 
 describe("Test BaselimeSDK for opentelemetry", () => {
 
-    const mockServer = getLocal({ debug: true });
+    const mockServer = getLocal();
     beforeEach(() => mockServer.start())
     afterEach(() => mockServer.stop())
 
-    it.skip("Capture Request bodies", async (t) => {
-        const mocked = await mockServer.forAnyRequest().once().thenReply(200, "Ok");
-        console.log('hi')
-        const postData = JSON.stringify({
-            'msg': 'Hello World!',
-        });
-
-        const url = new URL(mockServer.url);
-
-        const options = {
-            hostname: url.hostname,
-            port: mockServer.port,
-            path: '/upload',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(postData),
-            },
-        };
-
-        const clientRequest = new ClientRequest(options);
-
-
-        clientRequest.write(postData);
-
-        console.log('waiting for data')
-        clientRequest.on('data', (d) => {
-            console.log('data', d)
-        })
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        clientRequest.end();
-        clientRequest.on('end', (d) => {
-            console.log('end', d)
-        })
-
-        // expect(requests).toMatchInlineSnapshot('[]');
-        // const body = await captureBody(clientRequest);
-
-
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        // expect(body).toBe("Hello World");
-
-    });
-
-    it.skip('Instrument Req Body', async () => {
+    it('Instrument Req Body', async () => {
         const collector = await mockServer.forAnyRequest().twice().thenReply(200, "Ok");
         const baselimeKey = "love is magic"
         const sdk = new BaselimeSDK({
@@ -70,49 +25,95 @@ describe("Test BaselimeSDK for opentelemetry", () => {
             baselimeKey: baselimeKey,
             instrumentations: [
                 new HttpInstrumentation({
+                    ignoreOutgoingRequestHook: (req) => {
+                        if (req.hostname === "en0n5p81mzli7b.x.pipedream.net") {
+                            return false;
+                        }
+                        return true
+                    },
                     requestHook: async (span, request) => {
-                        console.log(request)
                         if (request instanceof ClientRequest) {
-                            const body = await captureBody(request);
-                            span.setAttribute('body', body)
-                            return
+                            console.log("has request body", request._hasBody)
+                            const chunks: string[] = [];
+                            // const oldWrite = request.write.bind(request);
+                           
+                            request.on('socket', (socket) => {
+                                const httpMessage = socket._httpMessage;
+
+                                let lines = [];
+                                if (httpMessage.hasOwnProperty('outputData')) {
+                                  lines = httpMessage.outputData[0].data.split('\n');
+                                } else if (httpMessage.hasOwnProperty('output')) {
+                                  lines = httpMessage.output[0].split('\n');
+                                }
+                                if (lines.length > 0) {
+                                    console.log(lines)
+                                  return lines[lines.length - 1];
+                                }
+                                console.log('socket')
+                            })
+
+                            request.on('data', chunk => {
+                                console.log(chunk)
+                                chunks.push(decodeURIComponent(chunk.toString()))
+                                // return oldWrite(chunk);
+                            });
+//  const oldEnd = request.end.bind(request);
+                            request.on('end', (chunk) => {
+                                if (chunk) {
+                                    console.log("chunk", chunk)
+                                    chunks.push(decodeURIComponent(chunk.toString()));
+                                    const body = chunks.join();
+                                    console.log(body)
+                                    span.setAttribute("request.body", body);
+                                    // return oldEnd(chunk);
+                                }
+
+                            });
                         }
                     },
                 })
             ]
         })
 
-        sdk.start();
+        const provider = sdk.start();
 
-        const span = await trace.getTracer("test").startActiveSpan("test", async (span) => {
-            const postData = JSON.stringify({
-                'msg': 'Hello World!',
-            });
+        await trace.getTracer("test").startActiveSpan("test", async (span) => {
+            return new Promise((resolve) => {
+                const postData = JSON.stringify({
+                    'msg': 'Hello World!',
+                });
 
-            const url = new URL(mockServer.url);
+                const url = new URL("https://en0n5p81mzli7b.x.pipedream.net/");
 
-            const options = {
-                hostname: url.hostname,
-                port: mockServer.port,
-                path: '/upload',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(postData),
-                },
-            };
-            const { request } = await import('http');
-            const req = request(options, () => span.end());
-
-            req.write(postData)
-            req.end();
+                const options = {
+                    hostname: url.hostname,
+                    port: url.port,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(postData),
+                    },
+                };
+                /**
+                 * This needs to be require for the instrumentation to work
+                 */
+                const { request } = require('https');
+                const req = request(options, (res: any) => {
+                    console.log('span end')
+                    span.end();
+                    console.log('done')
+                    return resolve(true)
+                });
+                console.log('sent req')
+                req.write(postData)
+                req.end();
+                console.log('written body')
+            })
         });
 
-
-
-        const [data, spans] = await waitForCollector(collector)
-        console.log(JSON.stringify(await data.body.getJson(), null, 2))
-        console.log(JSON.stringify(await spans.body.getJson(), null, 2))
-        expect(spans.headers["x-api-key"]).toBe(baselimeKey);
+        const [req1, req2] = await waitForCollector(collector)
+        // console.log(JSON.stringify(await req1.body.getJson(), null, 4))
+        // console.log(JSON.stringify(await req2.body.getJson(), null, 4))
     })
 });

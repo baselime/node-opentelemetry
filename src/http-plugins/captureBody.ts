@@ -1,27 +1,30 @@
-import { ClientRequest } from "http";
-
-export function captureBody(request: ClientRequest): Promise<string> {
+export function captureBody(request: any): Promise<string> {
     return new Promise((resolve, reject) => {
-        const chunks: string[] = [];
-        console.log(request)
-        // const oldWrite = request.write.bind(request);
-        // const oldEnd = request.end.bind(request);
-        request.on('data', chunk => {
-            console.log(chunk.toString());
-            chunks.push(decodeURIComponent(chunk.toString()))
-            // return oldWrite(chunk);
-        });
-        request.on('end', (chunk) => {
-            console.log(chunk.toString());
-            if (chunk) {
-                console.log(chunk.toString());
-                chunks.push(decodeURIComponent(chunk.toString()));
-            }
-            // oldEnd(chunk);
-            return resolve(chunks.join(''))
-        });
-        request.on('error', (err) => {
-            reject(err);
-        });
+        try {
+            const chunks: string[] = [];
+            const oldWrite = request.write.bind(request);
+           
+            request.on('data', chunk => {
+                console.log(chunk)
+                chunks.push(decodeURIComponent(chunk.toString()))
+                return oldWrite(chunk);
+            });
+            const oldEnd = request.end.bind(request);
+            request.on('end', (chunk) => {
+                if (chunk) {
+                    console.log("chunk", chunk)
+                    chunks.push(decodeURIComponent(chunk.toString()));
+                }
+                
+                 resolve(chunks.join(''))
+
+                 return oldEnd(chunk);
+            });
+            request.on('error', (err: any) => {
+                reject(err);
+            });
+        } catch(e) { 
+            console.log(e) 
+        }
     });
 }
