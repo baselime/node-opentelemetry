@@ -3,7 +3,7 @@ import { ClientRequest, IncomingMessage } from "http";
 import { HttpPlugin } from "./http-plugins/plugin.ts";
 import { flatten } from "flat";
 import { HttpInstrumentation, HttpInstrumentationConfig } from "@opentelemetry/instrumentation-http";
-import { captureBody } from "./http-plugins/captureBody.ts";
+import { captureRequestBody } from "./utils/captureRequestBody.ts";
 import { StripePlugin } from "./index.ts";
 
 
@@ -27,7 +27,7 @@ export function _betterHttpInstrumentation (options: BetterHttpInstrumentationOp
                 span.setAttribute('http.plugin.name', plugin.name);
                 
                 if (plugin.captureBody) {
-                    captureBody(request).then(body => {
+                    captureRequestBody(request).then(body => {
                         span.setAttributes(flatten({ body }));
                     })
                 }
