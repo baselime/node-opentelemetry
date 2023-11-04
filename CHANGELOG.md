@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased] 
+
+- Add Request Body Parsing
+- Add API KEY Tracer disabling
+  
 ## [0.2.8] - 2023-10-19
 
 - Improve service and namespace detection for vercel
