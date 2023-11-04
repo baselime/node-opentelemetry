@@ -34,7 +34,7 @@ export class BaselimeSDK {
     constructor(options: BaselimeSDKOpts) {
         options.serverless = options.serverless || false;
         options.collectorUrl = options.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
-        options.baselimeKey = options.baselimeKey || process.env.BASELIME_KEY
+        options.baselimeKey = options.baselimeKey || process.env.BASELIME_API_KEY || process.env.BASELIME_KEY
  
 
         this.options = options;
