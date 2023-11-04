@@ -35,15 +35,17 @@ export class BaselimeSDK {
         options.serverless = options.serverless || false;
         options.collectorUrl = options.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
         options.baselimeKey = options.baselimeKey || process.env.BASELIME_KEY
-        if (!options.baselimeKey) {
-            throw Error(`Please ensure that the BASELIME_KEY environment variable is set.`)
-        }
-
+ 
 
         this.options = options;
     }
 
     start() {
+        if (!this.options.baselimeKey) {
+            console.warn('BaselimeSDK: No Baselime API key provided. Traces will not be sent to Baselime.');
+            return;
+        }
+
         let collectorUrl = this.options.collectorUrl;
 
 
