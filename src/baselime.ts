@@ -1,4 +1,5 @@
 import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-node'
+import api, { DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 import { detectResourcesSync, ResourceAttributes } from '@opentelemetry/resources';
 import { awsEc2Detector, awsEcsDetector, awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
 import { VercelDetector } from './resources/vercel.ts';
@@ -46,6 +47,10 @@ export class BaselimeSDK {
             return;
         }
 
+        if (process.env.OTEL_LOG_LEVEL === "debug") {
+            api.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
+        }
+
         let collectorUrl = this.options.collectorUrl;
 
 
@@ -68,6 +73,7 @@ export class BaselimeSDK {
             headers: {
                 "x-api-key": this.options.baselimeKey || process.env.BASELIME_KEY || process.env.BASELIME_OTEL_KEY,
             },
+            timeoutMillis: 1000,
         });
 
         const spanProcessor = this.options.serverless ? new SimpleSpanProcessor(exporter) : new BatchSpanProcessor(exporter, {
