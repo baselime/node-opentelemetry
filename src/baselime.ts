@@ -56,7 +56,7 @@ export class BaselimeSDK {
 
         const provider = new NodeTracerProvider({
             resource: detectResourcesSync({
-                detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector()],
+                detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector({ serviceName: this.options.service })],
             }),
             forceFlushTimeoutMillis: 500,
         });
