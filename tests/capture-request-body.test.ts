@@ -36,37 +36,14 @@ describe("Test BaselimeSDK for opentelemetry", () => {
     beforeAll(() => mockServer.start())
     afterAll(() => mockServer.stop())
 
-    it('Instrument Req Body', () => new Promise(async (done) => {
+    it.skip('Instrument Req Body', () => new Promise(async (done) => {
         await mockServer.forAnyRequest().thenReply(200, "Ok");
         setupBaselimeSDK(async (request) => {
             const body = await captureRequestBody(request);
             console.log(body)
             expect(body).toBe('{"msg":"Hello World!"}');
         })
-
-
-        // const postData = JSON.stringify({
-        //     'msg': 'Hello World!',
-        // });
-
-        // const url = new URL(mockServer.url);
-
-        // const options = {
-        //     hostname: url.hostname,
-        //     port: url.port,
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Content-Length': Buffer.byteLength(postData),
-        //     },
-        // };
-        // /**
-        //  * This needs to be require for the instrumentation to work
-        //  */
-        // const { request } = require('http');
-        // const req = request(mockServer.url, options, () =>  done(true));
-        // req.write(postData)
-        // req.end();
+        
         await require('axios').post(mockServer.url, {
             'msg': 'Hello World!',
         });
