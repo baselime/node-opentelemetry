@@ -6,17 +6,8 @@ import {
 import {
     SemanticResourceAttributes,
 } from '@opentelemetry/semantic-conventions';
-import { config } from 'process';
-
-type VercelDetectorConfig = {
-    serviceName?: string, 
-}
 
 export class VercelDetector implements DetectorSync {
-    serviceName?: string;
-    constructor(config?: VercelDetectorConfig) {
-        this.serviceName = config?.serviceName;
-    }
     detect(_config?: ResourceDetectionConfig): Resource {
         if (!process.env.VERCEL) {
             return Resource.empty();
@@ -50,18 +41,13 @@ export class VercelDetector implements DetectorSync {
 
         const gitBranchUrl = String(process.env.VERCEL_BRANCH_URL);
         
-        if(gitBranchUrl && !this.serviceName) {
+        if(gitBranchUrl) {
             try { 
                 let serviceName = gitBranchUrl.split('-git-')[0]
                 attributes['service.name'] = serviceName;
                 attributes['service.namespace'] = serviceName;
             } catch(e) {
             }
-        }
-
-        if(this.serviceName) {
-            attributes['service.name'] = this.serviceName;
-            attributes['service.namespace'] = this.serviceName;
         }
 
         return new Resource(attributes);
