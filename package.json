@@ -44,7 +44,7 @@
   },
   "homepage": "https://github.com/baselime/node-opentelemetry#readme",
   "peerDependencies": {
-    "@trpc/server": "next"
+    "@trpc/server": "^10.0.0 || ^11.0.0"
   },
   "peerDependenciesMeta": {
     "@trpc/server": {
