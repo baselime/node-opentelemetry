@@ -24,16 +24,14 @@ type BaselimeSDKOpts = {
 /**
  * BaselimeSDK is a wrapper around the OpenTelemetry NodeSDK that configures it to send traces to Baselime.
  * 
- * @param {BaselimeSDKOpts} options
  * @param {InstrumentationOption[]} options.instrumentations - The OpenTelemetry instrumentations to enable.
- * @param {string} options.collectorUrl - The URL of the Baselime collector. Defaults to https://otel.baselime.io/v1
  * @param {string} options.baselimeKey - The Baselime API key. Defaults to the BASELIME_KEY environment variable.
  * @param {string} options.service - The name of the service. 
  * @param {string} options.namespace - The namespace of the service.
  * @param {boolean} options.serverless - Whether or not the service is running in a serverless environment. Defaults to false.
- * @param {Sampler} options.sampler - The OpenTelemetry sampler to use. Defaults to No Sampling.
  * @param {boolean} options.log - Whether or not to enable the log exporter. Defaults to false.
- * 
+ * @param {string} options.collectorUrl - The URL of the Baselime collector. Defaults to https://otel.baselime.io/v1
+ * @param {Sampler} options.sampler - The OpenTelemetry sampler to use. Defaults to No Sampling.
  */
 export class BaselimeSDK {
     options: BaselimeSDKOpts;
@@ -110,3 +108,5 @@ export class BaselimeSDK {
         return provider;
     }
 }
+
+new BaselimeSDK({ log: true }).start();
