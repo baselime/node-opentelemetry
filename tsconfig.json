@@ -2,7 +2,6 @@
     "compilerOptions": {
         "module": "nodenext",
         "allowImportingTsExtensions": true,
-        "emitDeclarationOnly": true,
         "declaration": true,
         "moduleResolution": "nodenext",
         "noImplicitAny": true,

@@ -28,6 +28,7 @@ jobs:
         run:
           npm ci &&
           npm run build &&
+          npm run check &&
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

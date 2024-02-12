@@ -22,6 +22,7 @@
     "vitest": "^0.34.6"
   },
   "scripts": {
+    "check": "tsc --noEmit",
     "build": "tsup",
     "test": "vitest",
     "release": "release-it"

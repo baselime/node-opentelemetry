@@ -24,8 +24,8 @@ export function tracing(options?: TracingOptions) {
             const result = await opts.next();
 
             // opts.rawInput is for v10, `opts.getRawInput` is for v11
-            const rawInput =
-                "rawInput" in opts ? opts.rawInput : await opts.getRawInput();
+            // @ts-expect-error
+            const rawInput = "rawInput" in opts ? opts.rawInput : await opts.getRawInput();
             if (options.collectInput && typeof rawInput === "object") {
                 span.setAttributes(flatten({ input: rawInput }))
             }
