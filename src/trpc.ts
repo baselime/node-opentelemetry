@@ -23,8 +23,11 @@ export function tracing(options?: TracingOptions) {
         return tracer.startActiveSpan(`TRPC ${opts.type}`, async (span: Span) => {
             const result = await opts.next();
 
-            if (options.collectInput && typeof opts.rawInput === "object") {
-                span.setAttributes(flatten({ input: opts.rawInput }))
+            // opts.rawInput is for v10, `opts.getRawInput` is for v11
+            const rawInput =
+                "rawInput" in opts ? opts.rawInput : await opts.getRawInput();
+            if (options.collectInput && typeof rawInput === "object") {
+                span.setAttributes(flatten({ input: rawInput }))
             }
             const meta = { path: opts.path, type: opts.type, ok: result.ok };
             span.setAttributes(meta)
