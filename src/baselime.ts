@@ -1,4 +1,4 @@
-import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-node'
+import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor, Sampler, ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node'
 import api, { DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 import { detectResourcesSync, ResourceAttributes } from '@opentelemetry/resources';
 import { awsEc2Detector, awsEcsDetector, awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
@@ -16,6 +16,7 @@ type BaselimeSDKOpts = {
     service?: string,
     namespace?: string,
     serverless?: boolean
+    sampler?: Sampler
 }
 
 
@@ -29,6 +30,7 @@ type BaselimeSDKOpts = {
  * @param {string} options.service - The name of the service. 
  * @param {string} options.namespace - The namespace of the service.
  * @param {boolean} options.serverless - Whether or not the service is running in a serverless environment. Defaults to false.
+ * @param {Sampler} options.sampler - The OpenTelemetry sampler to use. Defaults to No Sampling.
  * 
  */
 export class BaselimeSDK {
@@ -38,24 +40,14 @@ export class BaselimeSDK {
         options.serverless = options.serverless || false;
         options.collectorUrl = options.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
         options.baselimeKey = options.baselimeKey || process.env.BASELIME_API_KEY || process.env.BASELIME_KEY
- 
 
         this.options = options;
     }
 
     start() {
-        if (!this.options.baselimeKey) {
-            console.warn('BaselimeSDK: No Baselime API key provided. Traces will not be sent to Baselime.');
-            return;
-        }
-
         if (process.env.OTEL_LOG_LEVEL === "debug") {
             api.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
         }
-
-        let collectorUrl = this.options.collectorUrl;
-
-
         const provider = new NodeTracerProvider({
             resource: detectResourcesSync({
                 detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector(), new KoyebDetector(), new ServiceDetector({ serviceName: this.options.service })],
@@ -65,18 +57,29 @@ export class BaselimeSDK {
 
 
 
-        // If the baselime extension is running, we need to use the sandbox collector.
-        if (existsSync('/opt/extensions/baselime')) {
-            collectorUrl = 'http://sandbox:4323/otel';
-        }
+        // configure exporters
 
-        const exporter = new OTLPTraceExporter({
-            url: collectorUrl,
-            headers: {
-                "x-api-key": this.options.baselimeKey || process.env.BASELIME_KEY || process.env.BASELIME_OTEL_KEY,
-            },
-            timeoutMillis: 1000,
-        });
+        let exporter
+
+        if (!this.options.baselimeKey) {
+            console.warn('BaselimeSDK: No Baselime API key provided. Traces will be logged to the console');
+            exporter = new ConsoleSpanExporter();
+        } else {
+            let collectorUrl = this.options.collectorUrl;
+
+            // If the baselime extension is running, we need to use the sandbox collector.
+            if (existsSync('/opt/extensions/baselime')) {
+                collectorUrl = 'http://sandbox:4323/otel';
+            }
+
+            exporter = new OTLPTraceExporter({
+                url: collectorUrl,
+                headers: {
+                    "x-api-key": this.options.baselimeKey || process.env.BASELIME_KEY || process.env.BASELIME_OTEL_KEY,
+                },
+                timeoutMillis: 1000,
+            });
+        }
 
         const spanProcessor = this.options.serverless ? new SimpleSpanProcessor(exporter) : new BatchSpanProcessor(exporter, {
             maxQueueSize: 100,
