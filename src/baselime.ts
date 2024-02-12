@@ -49,6 +49,7 @@ export class BaselimeSDK {
             api.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
         }
         const provider = new NodeTracerProvider({
+            sampler: this.options.sampler,
             resource: detectResourcesSync({
                 detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector(), new KoyebDetector(), new ServiceDetector({ serviceName: this.options.service })],
             }),
@@ -86,6 +87,7 @@ export class BaselimeSDK {
             maxExportBatchSize: 5,
         });
 
+      
         provider.addSpanProcessor(spanProcessor);
         provider.register();
 
