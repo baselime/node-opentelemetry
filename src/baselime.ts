@@ -14,6 +14,7 @@ type BaselimeSDKOpts = {
     collectorUrl?: string,
     baselimeKey?: string,
     service?: string,
+    log?: boolean,
     namespace?: string,
     serverless?: boolean
     sampler?: Sampler
@@ -31,6 +32,7 @@ type BaselimeSDKOpts = {
  * @param {string} options.namespace - The namespace of the service.
  * @param {boolean} options.serverless - Whether or not the service is running in a serverless environment. Defaults to false.
  * @param {Sampler} options.sampler - The OpenTelemetry sampler to use. Defaults to No Sampling.
+ * @param {boolean} options.log - Whether or not to enable the log exporter. Defaults to false.
  * 
  */
 export class BaselimeSDK {
@@ -60,12 +62,14 @@ export class BaselimeSDK {
 
         // configure exporters
 
-        let exporter
+        let exporter: OTLPTraceExporter | ConsoleSpanExporter | undefined = undefined;
 
-        if (!this.options.baselimeKey) {
-            console.warn('BaselimeSDK: No Baselime API key provided. Traces will be logged to the console');
-            exporter = new ConsoleSpanExporter();
-        } else {
+        if(!this.options.baselimeKey) {
+            console.warn("No Baselime API key provided. Traces will not be sent to Baselime.")
+        }
+        
+        
+        if (this.options.baselimeKey) {
             let collectorUrl = this.options.collectorUrl;
 
             // If the baselime extension is running, we need to use the sandbox collector.
@@ -82,13 +86,20 @@ export class BaselimeSDK {
             });
         }
 
-        const spanProcessor = this.options.serverless ? new SimpleSpanProcessor(exporter) : new BatchSpanProcessor(exporter, {
-            maxQueueSize: 100,
-            maxExportBatchSize: 5,
-        });
+        if (this.options.log) {
+            exporter = new ConsoleSpanExporter();
+        }
 
-      
-        provider.addSpanProcessor(spanProcessor);
+        if(exporter) {
+            const spanProcessor = this.options.serverless ? new SimpleSpanProcessor(exporter) : new BatchSpanProcessor(exporter, {
+                maxQueueSize: 100,
+                maxExportBatchSize: 5,
+            });
+    
+          
+            provider.addSpanProcessor(spanProcessor);
+        }
+        
         provider.register();
 
         registerInstrumentations({
