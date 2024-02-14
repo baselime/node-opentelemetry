@@ -1,6 +1,6 @@
 {
   "name": "@baselime/node-opentelemetry",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Instrument node.js applications with open telemetry ",
   "type": "module",
   "main": "dist/index.js",
