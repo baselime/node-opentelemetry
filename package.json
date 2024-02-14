@@ -47,11 +47,6 @@
   "peerDependencies": {
     "@trpc/server": "^10.0.0 || ^11.0.0"
   },
-  "peerDependenciesMeta": {
-    "@trpc/server": {
-      "optional": true
-    }
-  },
   "dependencies": {
     "@opentelemetry/api": "^1.7.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.45.0",

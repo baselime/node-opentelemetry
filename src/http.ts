@@ -4,7 +4,6 @@ import { HttpPlugin } from "./http-plugins/plugin.ts";
 import { flatten } from "flat";
 import { HttpInstrumentation, HttpInstrumentationConfig } from "@opentelemetry/instrumentation-http";
 import { captureRequestBody } from "./utils/captureRequestBody.ts";
-import { StripePlugin } from "./index.ts";
 
 
 type BetterHttpInstrumentationOptions = {
