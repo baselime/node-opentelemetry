@@ -108,5 +108,3 @@ export class BaselimeSDK {
         return provider;
     }
 }
-
-new BaselimeSDK({ log: true }).start();
