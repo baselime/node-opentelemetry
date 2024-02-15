@@ -10,7 +10,6 @@ type TracingOptions = {
 }
 
 /**
- * 
  * @param options 
  * @param options.collectInput - Whether or not to collect the input of the request. Defaults to false.
  * 
