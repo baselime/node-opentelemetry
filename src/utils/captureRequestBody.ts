@@ -15,6 +15,8 @@ function isHttpBody(body?: any) {
 }
 
 function patchWriteOrEndReq(original: ClientRequest['write' | 'end']) {
+
+    console.log('running the patch')
     return function () {
         var returned = original.apply(this, arguments);
         if (isHttpBody(arguments[0])) {
@@ -31,12 +33,14 @@ function patchWriteOrEndReq(original: ClientRequest['write' | 'end']) {
 
 export function captureRequestBody(request: ClientRequest): Promise<string> {
     return new Promise((resolve) => {
+        
         /** patch write function */
         shimmer.wrap(request, 'write', patchWriteOrEndReq);
 
         shimmer.wrap(request, 'end', patchWriteOrEndReq);
 
         request.on('socket', (socket) => safely(() => {
+            console.log('on socket')
             if (socket.hasOwnProperty('_httpMessage')) {
 
                 const httpMessage = (socket as any)._httpMessage as HTTPMessage;

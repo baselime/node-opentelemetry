@@ -1,16 +1,28 @@
 import { withOpenTelemetry } from "./tracing";
 import { S3 } from "@aws-sdk/client-s3";
-const s3 = new S3({ });
+import axios from 'axios';
+import qs from 'node:querystring';
+import FormData from 'form-data';
+const s3 = new S3({});
 
 export const handler = withOpenTelemetry(async (_evt) => {
-  console.log('Hello world. The time is', new Date().toISOString());
 
-  const result = await fetch('https://api.github.com/users/octocat');
-  const json = await result.json();
+  // await axios.get('https://jsonplaceholder.typicode.com/todos/1');
+  await axios.post('https://jsonplaceholder.typicode.com/posts', {
+    title: 'foo',
+    body: 'bar',
+    userId: 5
+  });
 
-  const buckets = await s3.listBuckets({});
+  await axios.post('https://jsonplaceholder.typicode.com/pos', {
+    title: 'foo',
+    body: 'bar',
+    userId: 5
+  });
+
+
   return {
     statusCode: 200,
-    body: JSON.stringify(buckets.Buckets),
+    body: 'hi there from lambda!',
   };
 });

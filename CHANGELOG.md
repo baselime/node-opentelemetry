@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [Unreleased]
+
+* Support for capturing http client request and response bodies
+
+
 ## [0.3.9] - 2024-02-29
 
 * adds some utils for aws lambda

@@ -53,6 +53,7 @@ export class BaselimeSDK {
             resource: detectResourcesSync({
                 detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector(), new KoyebDetector(), new ServiceDetector({ serviceName: this.options.service })],
             }),
+            forceFlushTimeoutMillis: 5000,
         });
 
 

@@ -25,6 +25,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.523.0",
     "@opentelemetry/instrumentation-aws-sdk": "^0.38.1",
-    "@opentelemetry/instrumentation-fetch": "^0.48.0"
+    "@opentelemetry/instrumentation-fetch": "^0.48.0",
+    "axios": "^1.6.7",
+    "form-data": "^4.0.0"
   }
 }

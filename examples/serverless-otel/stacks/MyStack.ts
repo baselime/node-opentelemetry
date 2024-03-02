@@ -10,15 +10,15 @@ export function API({ stack }: StackContext) {
   const api = new Api(stack, "api", {
     defaults: {
       function: {
-        runtime: "nodejs18.x",
+        runtime: "nodejs16.x",
         functionName: "api",
         nodejs: {
-          install: ["@smithy/middleware-stack", "@aws-sdk/middleware-stack", "import-in-the-middle"]
+          format: 'cjs',
+          install: ["@smithy/middleware-stack", "@aws-sdk/middleware-stack"]
         },
         bind: [bus],
         environment: {
           BASELIME_KEY: process.env.BASELIME_KEY || '',
-          OTEL_LOG_LEVEL: 'debug',
         }
       },
     },
