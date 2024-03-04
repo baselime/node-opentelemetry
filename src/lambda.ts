@@ -1,4 +1,4 @@
-import api, { trace, context, propagation, Context as OtelContext, ROOT_CONTEXT, Attributes } from "@opentelemetry/api";
+import api, { trace, context, propagation, Context as OtelContext, ROOT_CONTEXT, Attributes, Link, } from "@opentelemetry/api";
 import { Handler, DynamoDBStreamEvent, S3Event, APIGatewayProxyEventV2, APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { flatten } from "flat"
 
@@ -13,11 +13,30 @@ type HttpEvent = { body: unknown, headers: { [key: string]: string | undefined }
 let coldstart = true;
 const tracer = trace.getTracer('@baselime/baselime-lambda-wrapper', '1');
 
-export function wrap(handler: Handler) {
+type LambdaWrapperOptions = {
+  proactiveInitializationThreshold?: number | undefined
+  captureEvent?: boolean | undefined
+  captureResponse?: boolean | undefined
+  determineParent?: (event: unknown, service: string) => { traceparent: string, tracestate?: string } | { traceparent: string, tracestate?: string }[] | undefined
+}
+
+
+/**
+ * Wrap a lambda handler with OpenTelemetry tracing
+ * @param handler 
+ * @param opts 
+ * @returns 
+ */
+export function wrap(handler: Handler, opts: LambdaWrapperOptions = {}) {
   return async function (event: any, lambda_context: Context, callback?: Callback) {
     const service = detectService(event);
     const trigger = triggerToServiceType(service);
-    const parent = determinParent(event, service);
+
+    const rawParent = opts.determineParent?.(event, service);
+
+    const links = determineLinks(rawParent);
+    const parent = determinParent(event, service, rawParent);
+
     let document: FaasDocument | null = null;
     let httpEvent: HttpEvent | undefined = undefined;
     if (trigger === "http") {
@@ -32,7 +51,10 @@ export function wrap(handler: Handler) {
         document = getS3DocumentAttributes(event);
       }
     }
+
+
     const span = tracer.startSpan(lambda_context.functionName, {
+      links,
       attributes: flatten({
         event: httpEvent || event,
         context: {
@@ -110,6 +132,22 @@ export function wrap(handler: Handler) {
   }
 }
 
+function determineLinks(rawParent: { traceparent: string } | { traceparent: string, tracestate?: string }[] | undefined): Link[] {
+  if (!Array.isArray(rawParent)) {
+    return []
+  }
+
+  return rawParent.map((parent) => {
+    return {
+      context: {
+        traceId: parent.traceparent.split('-')[1],
+        spanId: parent.traceparent.split('-')[2],
+        traceFlags: Number(parent.traceparent.split('-')[3]),
+      }
+    }
+  });
+}
+
 
 function detectService(event: any) {
   if (event.requestContext?.apiId) {
@@ -181,8 +219,10 @@ const snsGetter = {
   },
 };
 
-function determinParent(event: any, service: string): OtelContext {
-  let parent: OtelContext | undefined = undefined;
+function determinParent(event: any, service: string, rawParent: ReturnType<LambdaWrapperOptions['determineParent']>): OtelContext {
+  if(rawParent && !Array.isArray(rawParent)) {
+    return propagation.extract(api.context.active(), rawParent);
+  }
 
   const extractedContext = extractContext(event, service);
 
@@ -190,10 +230,7 @@ function determinParent(event: any, service: string): OtelContext {
     return extractedContext;
   }
 
-  if (!parent) {
-    return ROOT_CONTEXT
-  }
-  return parent;
+  return ROOT_CONTEXT
 }
 
 function extractContext(event: any, service: string) {
