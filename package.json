@@ -39,7 +39,7 @@
     "build": "tsup",
     "test": "vitest",
     "release": "release-it",
-    "postinstall": "patch-package"
+    "prebuild": "patch-package"
   },
   "repository": {
     "type": "git",

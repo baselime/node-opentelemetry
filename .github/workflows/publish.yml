@@ -27,6 +27,7 @@ jobs:
         continue-on-error: true
         run:
           npm ci &&
+          npx patch-package &&
           npm run build &&
           npm run check &&
           npm publish --access public
