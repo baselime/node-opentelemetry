@@ -27,7 +27,7 @@ type LambdaWrapperOptions = {
  * @param opts 
  * @returns 
  */
-export function wrap(handler: Handler, opts: LambdaWrapperOptions = {}) {
+export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions = {}) {
   return async function (event: any, lambda_context: Context, callback?: Callback) {
     const service = detectService(event);
     const trigger = triggerToServiceType(service);

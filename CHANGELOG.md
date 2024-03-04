@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+* Bundle seperately and package opentelemetry
+* Fix import-in-the-middle import with a patch
+
 ## [0.4.0] - 2024-03-02
 
 * Support for capturing http client request and response bodies

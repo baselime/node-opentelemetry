@@ -3,10 +3,22 @@
   "version": "0.4.0",
   "description": "Instrument node.js applications with open telemetry ",
   "type": "module",
-  "main": "dist/index.js",
   "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./lambda": {
+      "import": "./dist/lambda.js",
+      "require": "./dist/lambda.cjs",
+      "types": "./dist/lambda.d.ts"
+    },
+    "./trpc": {
+      "import": "./dist/trpc.js",
+      "require": "./dist/trpc.cjs",
+      "types": "./dist/trpc.d.ts"
+    }
   },
   "files": [
     "dist"
@@ -16,6 +28,7 @@
     "@types/node": "^20.8.6",
     "esbuild": "^0.19.4",
     "mockttp": "^3.9.4",
+    "patch-package": "^8.0.0",
     "release-it": "^16.2.1",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
@@ -25,7 +38,8 @@
     "check": "tsc --noEmit",
     "build": "tsup",
     "test": "vitest",
-    "release": "release-it"
+    "release": "release-it",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
