@@ -116,12 +116,6 @@ function getClientRequestBody(r: ClientRequest, cb: (body: string) => void) {
     const oldWrite = r.write.bind(r);
     r.write = (data: Buffer | string) => {
         try {
-            console.log('write called', data);
-
-            for (let d of data) {
-                console.log('data', d)
-            }
-            console.log('writing', data.toString('utf8'))
             if (typeof data === 'string') {
                 chunks.push(Buffer.from(data));
 
@@ -138,7 +132,6 @@ function getClientRequestBody(r: ClientRequest, cb: (body: string) => void) {
                 }
             }
         } catch (e) {
-            console.log('error', e)
         }
         return oldWrite(data);
     };
@@ -179,7 +172,6 @@ function getClientResponseBody(r: IncomingMessage, cb: (body: string) => void) {
         try {
             if (chunks.length > 0) {
                 const body = Buffer.concat(chunks).toString('utf8');
-                console.log('response body', body)
                 cb(body)
             }
         } catch (e) {

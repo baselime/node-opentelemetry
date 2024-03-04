@@ -16,6 +16,7 @@ export function API({ stack }: StackContext) {
           format: 'cjs',
           install: ["@smithy/middleware-stack", "@aws-sdk/middleware-stack"]
         },
+        timeout: 5,
         bind: [bus],
         environment: {
           BASELIME_KEY: process.env.BASELIME_KEY || '',

@@ -1,5 +1,6 @@
-import { BaselimeSDK, BetterHttpInstrumentation, withOpenTelemetry } from '../../../../../src/index'
+import { BaselimeSDK, BetterHttpInstrumentation } from '../../../../../src/index'
 import { AwsInstrumentation } from '@opentelemetry/instrumentation-aws-sdk';
+import { withOpenTelemetry } from '../../../../../src/lambda';
 
 new BaselimeSDK({
     baselimeKey: process.env.BASELIME_KEY, collectorUrl: 'https://otel.baselime.cc/v1', serverless: false, instrumentations: [

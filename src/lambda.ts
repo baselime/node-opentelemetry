@@ -11,16 +11,18 @@ type FaasDocument = {
 
 type HttpEvent = { body: unknown, headers: { [key: string]: string | undefined } };
 let coldstart = true;
+const initTime = Date.now();
 const tracer = trace.getTracer('@baselime/baselime-lambda-wrapper', '1');
 
 type LambdaWrapperOptions = {
   proactiveInitializationThreshold?: number | undefined
   captureEvent?: boolean | undefined
   captureResponse?: boolean | undefined
+  timeoutThreshold?: number | undefined
   determineParent?: (event: unknown, service: string) => { traceparent: string, tracestate?: string } | { traceparent: string, tracestate?: string }[] | undefined
 }
 
-
+const timeoutErrorMessage = `The Baselime OpenTelemetry SDK has detected that this lambda is very close to timing out.`
 /**
  * Wrap a lambda handler with OpenTelemetry tracing
  * @param handler 
@@ -29,6 +31,10 @@ type LambdaWrapperOptions = {
  */
 export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions = {}) {
   return async function (event: any, lambda_context: Context, callback?: Callback) {
+    let proActiveInitialization
+    if (Date.now() - initTime > (opts.proactiveInitializationThreshold || 2000)) {
+      proActiveInitialization = true;
+    }
     const service = detectService(event);
     const trigger = triggerToServiceType(service);
 
@@ -76,6 +82,7 @@ export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions =
           invoked_by: service,
           id: lambda_context.invokedFunctionArn,
           coldstart,
+          proActiveInitialization
         },
         cloud: {
           resource_id: lambda_context.invokedFunctionArn,
@@ -86,6 +93,25 @@ export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions =
     coldstart = false;
     const ctx = trace.setSpan(context.active(), span);
 
+    const timeRemaining = lambda_context.getRemainingTimeInMillis();
+    console.log('timeRemaining', timeRemaining);
+    setTimeout(async () => {
+      console.log('timeout', lambda_context.getRemainingTimeInMillis());
+      const error = new Error(timeoutErrorMessage);
+      error.name = "Possible Lambda Timeout";
+      span.setAttributes(flatten({ error: { name: error.name, message: error.message } }) as Attributes);
+      span.recordException(error);
+      span.end();
+      try {
+        console.time('flush');
+        // @ts-expect-error
+        await trace.getTracerProvider().getDelegate().forceFlush();
+        console.timeEnd('flush')
+      } catch (_) {
+        console.error(_)
+      }
+
+    }, timeRemaining - (opts.timeoutThreshold || 500));
     try {
 
       const result = await context.with(ctx, async (e, lc, cb) => {
@@ -220,7 +246,7 @@ const snsGetter = {
 };
 
 function determinParent(event: any, service: string, rawParent: ReturnType<LambdaWrapperOptions['determineParent']>): OtelContext {
-  if(rawParent && !Array.isArray(rawParent)) {
+  if (rawParent && !Array.isArray(rawParent)) {
     return propagation.extract(api.context.active(), rawParent);
   }
 
