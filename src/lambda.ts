@@ -94,21 +94,16 @@ export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions =
     const ctx = trace.setSpan(context.active(), span);
 
     const timeRemaining = lambda_context.getRemainingTimeInMillis();
-    console.log('timeRemaining', timeRemaining);
     setTimeout(async () => {
-      console.log('timeout', lambda_context.getRemainingTimeInMillis());
       const error = new Error(timeoutErrorMessage);
       error.name = "Possible Lambda Timeout";
       span.setAttributes(flatten({ error: { name: error.name, message: error.message } }) as Attributes);
       span.recordException(error);
       span.end();
       try {
-        console.time('flush');
         // @ts-expect-error
         await trace.getTracerProvider().getDelegate().forceFlush();
-        console.timeEnd('flush')
       } catch (_) {
-        console.error(_)
       }
 
     }, timeRemaining - (opts.timeoutThreshold || 500));

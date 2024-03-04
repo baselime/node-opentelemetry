@@ -16,7 +16,6 @@ function isHttpBody(body?: any) {
 
 function patchWriteOrEndReq(original: ClientRequest['write' | 'end']) {
 
-    console.log('running the patch')
     return function () {
         var returned = original.apply(this, arguments);
         if (isHttpBody(arguments[0])) {
