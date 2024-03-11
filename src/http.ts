@@ -177,7 +177,11 @@ function getClientResponseBody(r: IncomingMessage, cb: (body: string) => void) {
         } catch (e) {
         }
     });
+    
+    const originalState = r.readableFlowing;
     r.pipe(pt);
+    // @ts-ignore
+    r.readableFlowing = originalState;
 }
 
 function shouldCaptureBody(host: string) {

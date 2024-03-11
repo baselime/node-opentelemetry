@@ -38,8 +38,7 @@
     "check": "tsc --noEmit",
     "build": "tsup",
     "test": "vitest",
-    "release": "release-it",
-    "prebuild": "patch-package"
+    "release": "release-it"
   },
   "repository": {
     "type": "git",
@@ -73,7 +72,6 @@
     "@types/aws-lambda": "^8.10.134",
     "axios": "^1.6.0",
     "flat": "^6.0.1",
-    "shimmer": "^1.2.1",
     "undici": "^5.26.3"
   }
 }

@@ -7,23 +7,24 @@ const s3 = new S3({});
 
 export const handler = withOpenTelemetry(async () => {
 
+  const buckets = await s3.listBuckets({});
   // await axios.get('https://jsonplaceholder.typicode.com/todos/1');
-  await axios.post('https://jsonplaceholder.typicode.com/posts', {
-    title: 'foo',
-    body: 'bar',
-    userId: 5
-  });
+  // await axios.post('https://jsonplaceholder.typicode.com/posts', {
+  //   title: 'foo',
+  //   body: 'bar',
+  //   userId: 5
+  // });
 
-  await axios.post('https://jsonplaceholder.typicode.com/posts', {
-    title: 'foo',
-    body: 'bar',
-    userId: 5
-  });
+  // await axios.post('https://jsonplaceholder.typicode.com/posts', {
+  //   title: 'foo',
+  //   body: 'bar',
+  //   userId: 5
+  // });
 
-  await new Promise((resolve) => setTimeout(resolve, 30000));
+  // await new Promise((resolve) => setTimeout(resolve, 30000));
 
   return {
     statusCode: 200,
-    body: 'hi there from lambda!',
+    body: JSON.stringify(buckets.Buckets)
   };
 });

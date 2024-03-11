@@ -1,7 +1,7 @@
 import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor, Sampler, ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node'
 import api, { DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 import { detectResourcesSync, ResourceAttributes } from '@opentelemetry/resources';
-import { awsEc2Detector, awsEcsDetector, awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
+import { awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
 import { VercelDetector } from './resources/vercel.ts';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/instrumentation';
@@ -51,7 +51,7 @@ export class BaselimeSDK {
         const provider = new NodeTracerProvider({
             sampler: this.options.sampler,
             resource: detectResourcesSync({
-                detectors: [awsEcsDetector, awsEc2Detector, awsLambdaDetector, new VercelDetector(), new KoyebDetector(), new ServiceDetector({ serviceName: this.options.service })],
+                detectors: [awsLambdaDetector, new VercelDetector(), new KoyebDetector(), new ServiceDetector({ serviceName: this.options.service })],
             }),
             forceFlushTimeoutMillis: 5000,
         });
