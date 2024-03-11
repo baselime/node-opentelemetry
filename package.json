@@ -5,18 +5,15 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
     "./lambda": {
-      "import": "./dist/lambda.js",
-      "require": "./dist/lambda.cjs",
+      "default": "./dist/lambda.cjs",
       "types": "./dist/lambda.d.ts"
     },
     "./trpc": {
-      "import": "./dist/trpc.js",
-      "require": "./dist/trpc.cjs",
+      "default": "./dist/trpc.cjs",
       "types": "./dist/trpc.d.ts"
     }
   },

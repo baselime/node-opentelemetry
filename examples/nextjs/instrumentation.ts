@@ -1,6 +1,6 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    const { BaselimeSDK, VercelPlugin, BetterHttpInstrumentation } = await import('../../dist');
+    const { BaselimeSDK, VercelPlugin, BetterHttpInstrumentation } = await import('../../dist/index.cjs');
     const sdk = new BaselimeSDK({
       serverless: true,
       service: "your-project-name",
