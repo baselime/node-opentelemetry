@@ -5,16 +5,16 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
     },
     "./lambda": {
-      "default": "./dist/lambda.cjs",
-      "types": "./dist/lambda.d.ts"
+      "types": "./dist/lambda.d.cts",
+      "default": "./dist/lambda.cjs"
     },
     "./trpc": {
-      "default": "./dist/trpc.cjs",
-      "types": "./dist/trpc.d.ts"
+      "types": "./dist/trpc.d.cts",
+      "default": "./dist/trpc.cjs"
     }
   },
   "files": [
