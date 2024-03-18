@@ -1,6 +1,6 @@
 import { BatchSpanProcessor, NodeTracerProvider, SimpleSpanProcessor, Sampler, ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node'
-import api, { DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
-import { DetectorSync, detectResourcesSync, ResourceAttributes } from '@opentelemetry/resources';
+import api, { Attributes, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
+import { DetectorSync, detectResourcesSync, Resource, ResourceAttributes } from '@opentelemetry/resources';
 import { awsLambdaDetector } from '@opentelemetry/resource-detector-aws'
 import { VercelDetector } from './resources/vercel.ts';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
@@ -18,7 +18,8 @@ type BaselimeSDKOpts = {
     namespace?: string,
     serverless?: boolean
     sampler?: Sampler
-    resourceDetectors?: DetectorSync[]
+    resourceDetectors?: DetectorSync[],
+    resourceAttributes?: Resource | Attributes
 }
 
 
@@ -57,7 +58,7 @@ export class BaselimeSDK {
                     new VercelDetector(), 
                     new KoyebDetector(), 
                     ...(this.options.resourceDetectors || []),  
-                    new ServiceDetector({ serviceName: this.options.service })
+                    new ServiceDetector({ serviceName: this.options.service, attributes: this.options.resourceAttributes })
                 ],
             }),
             forceFlushTimeoutMillis: 5000,
