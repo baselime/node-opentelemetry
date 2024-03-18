@@ -9,6 +9,7 @@ export default defineConfig({
   format: ['cjs'],
   target: 'node18',
   minify: false,
+  metafile: true,
   // for now we include flat in the bundle because it is not exported correctly for both esm and cjs
   noExternal: [/flat/, /opentelemetry/],
 })

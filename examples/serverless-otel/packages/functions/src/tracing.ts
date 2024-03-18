@@ -11,7 +11,8 @@ new BaselimeSDK({
         captureBody: true,
         captureHeaders: true,
       })
-    ]
+    ],
+    resourceDetectors: []
   }).start();
 
 export {

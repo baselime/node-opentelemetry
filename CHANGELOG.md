@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+## [Unreleased]
+
+* add support for passing custom detectors
 
 ## [0.4.6] - 2024-03-11
 
