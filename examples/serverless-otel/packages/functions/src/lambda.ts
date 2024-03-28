@@ -14,7 +14,9 @@ export const handler = withOpenTelemetry(async () => {
   const span = tracer.startSpan('example');
 
   await new Promise((resolve) => setTimeout(resolve, 1000));
-
+  if(Math.random() > 0.5) {
+    throw new Error('Random error');
+  }
   span.end()
   return {
     statusCode: 200,

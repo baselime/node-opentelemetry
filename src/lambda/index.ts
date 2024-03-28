@@ -61,6 +61,7 @@ export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions =
                 const err = e as Error;
                 span.recordException(err);
                 span.setAttributes(flatten({ error: { name: err.name, message: err.message, stack: err.stack } }));
+                throw err;
             } finally {
                 span.end();
                 await flushTraces();
