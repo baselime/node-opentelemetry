@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [Unreleased]
+
+* handle modified traceparent better
+
 ## [0.5.3] - 2024-03-28
 
 * Handle undefined traceparent for step function propagation
