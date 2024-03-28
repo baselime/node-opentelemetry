@@ -51,9 +51,10 @@ export function extractContext(service: string, event: any): { parent?: Context,
                     }).filter(el => el)
                 }
             }
+            const traceparent = event._baselime?.traceparent || event.Payload?._baselime.traceparent;
 
             return {
-                parent: propagation.extract(context.active(), event?.baselime || event.Payload?.baselime, headerGetter)
+                parent: propagation.extract(context.active(), { traceparent }, headerGetter)
             }
         default:
             return {

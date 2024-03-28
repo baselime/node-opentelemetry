@@ -135,7 +135,11 @@ function detectService(event: any) {
         return "eventbridge";
     }
 
-    if (process.env.BASELIME_TRACE_STEP_FUNCTION === "true" || event.Payload?.baselime?.traceparent || (Array.isArray(event) && event[0]?.Payload?.baselime?.traceparent)) {
+    if (
+        process.env.BASELIME_TRACE_STEP_FUNCTION === "true" ||
+        event.Payload?._baselime?.traceparent || event._baselime?.traceparent ||
+        (Array.isArray(event) && (event[0]?.Payload?.baselime?.traceparent || event[0]?._baselime?.traceparent))
+    ) {
         return "step-function";
     }
     return 'unknown'
