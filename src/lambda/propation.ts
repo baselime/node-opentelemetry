@@ -37,7 +37,7 @@ export function extractContext(service: string, event: any): { parent?: Context,
             if (Array.isArray(event)) {
                 return {
                     links: event.map((parent) => {
-                        const traceparent = parent._baselime?.traceparent || parent.Payload?._baselime.traceparent;
+                        const traceparent = parent._baselime?.traceparent || parent.Payload?._baselime?.traceparent;
                         if (!traceparent) {
                             return
                         }
@@ -51,7 +51,7 @@ export function extractContext(service: string, event: any): { parent?: Context,
                     }).filter(el => el)
                 }
             }
-            const traceparent = event._baselime?.traceparent || event.Payload?._baselime.traceparent;
+            const traceparent = event._baselime?.traceparent || event.Payload?._baselime?.traceparent;
 
             return {
                 parent: propagation.extract(context.active(), { traceparent }, headerGetter)

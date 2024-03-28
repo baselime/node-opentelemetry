@@ -1,4 +1,4 @@
-import { withOpenTelemetry } from "./tracing";
+// import { withOpenTelemetry } from "./tracing";
 import { ApiHandler } from "sst/node/api";
 
 export const handler = withOpenTelemetry(ApiHandler(async (_evt) => {
