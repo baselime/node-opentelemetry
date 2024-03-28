@@ -37,7 +37,7 @@ export function extractContext(service: string, event: any): { parent?: Context,
             if (Array.isArray(event)) {
                 return {
                     links: event.map((parent) => {
-                        const traceparent = parent.Payload?.baselime.traceparent;
+                        const traceparent = parent._baselime?.traceparent || parent.Payload?._baselime.traceparent;
                         if (!traceparent) {
                             return
                         }
@@ -51,8 +51,9 @@ export function extractContext(service: string, event: any): { parent?: Context,
                     }).filter(el => el)
                 }
             }
+
             return {
-                parent: propagation.extract(context.active(), event.Payload?.baselime || {}, headerGetter)
+                parent: propagation.extract(context.active(), event?.baselime || event.Payload?.baselime, headerGetter)
             }
         default:
             return {
@@ -67,7 +68,7 @@ export function injectContextToResponse(service: string, result: any, span: Span
         case 'step-function':
             propagation.inject(ctx, result, {
                 set(carrier, key, value) {
-                    carrier['baselime'] = {
+                    carrier['_baselime'] = {
                         [key]: value
                     }
                 }
