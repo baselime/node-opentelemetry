@@ -1,6 +1,6 @@
 import { StackContext, Function } from "sst/constructs";
-import { LambdaInvoke } from "aws-cdk-lib/aws-stepfunctions-tasks";
-import { Chain, Parallel, StateMachine, TaskInput, State} from "aws-cdk-lib/aws-stepfunctions";
+import { LambdaInvoke, SnsPublish } from "aws-cdk-lib/aws-stepfunctions-tasks";
+import { Chain, Parallel, StateMachine, TaskInput} from "aws-cdk-lib/aws-stepfunctions";
 export function API({ stack }: StackContext) {
 
   stack.addDefaultFunctionEnv({
@@ -19,10 +19,10 @@ export function API({ stack }: StackContext) {
     }),
     payload: TaskInput.fromObject({
       code: TaskInput.fromJsonPathAt("$.Payload.statusCode").value,
-      _baselime: TaskInput.fromJsonPathAt("$.Payload._baselime").value
+      _baselime: TaskInput.fromJsonPathAt("$.Payload.['_baselime', 'null']").value
     })
   })
-
+  
   const taskTwoB = new LambdaInvoke(stack, "TaskTwoB", {
     lambdaFunction: new Function(stack, "task-two-b", {
       handler: "packages/functions/src/task-two.handler",
