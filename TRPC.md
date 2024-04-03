@@ -16,7 +16,7 @@ Add the Middleware to the procedures you want to trace
 
 ```typescript
 // trpc.ts
-import { trpcTracingMiddleware } from "@baselime/node-opentelemetry/trpc";
+import { tracing } from "@baselime/node-opentelemetry/trpc";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   ...
