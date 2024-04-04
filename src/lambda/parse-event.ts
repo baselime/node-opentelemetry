@@ -146,14 +146,14 @@ function detectService(event: any) {
 }
 
 
-export function parseInput(event: any, lambda_context: LambdaContext, coldstart: boolean, proActiveInitialization: boolean) {
+export function parseInput(event: any, lambda_context: LambdaContext, coldstart: boolean, proActiveInitialization: boolean, captureEvent: boolean = false) {
 
     const service = detectService(event);
     const trigger = triggerToServiceType(service);
 
     let document: FaasDocument | null = null;
     let httpEvent: HttpEvent | undefined = undefined;
-    if (trigger === "http") {
+    if (trigger === "http" && captureEvent) {
         httpEvent = parseHttpEvent(event);
     }
     if (trigger === 'datasource') {
@@ -167,7 +167,7 @@ export function parseInput(event: any, lambda_context: LambdaContext, coldstart:
     }
 
     const attributes = flatten({
-        event: httpEvent || event,
+        event: captureEvent && (httpEvent || event),
         context: {
             functionName: lambda_context.functionName,
             functionVersion: lambda_context.functionVersion,

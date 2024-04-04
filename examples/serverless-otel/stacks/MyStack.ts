@@ -1,4 +1,4 @@
-import { StackContext, Api, EventBus } from "sst/constructs";
+import { StackContext, Api, EventBus, Bucket } from "sst/constructs";
 
 export function API({ stack }: StackContext) {
   const bus = new EventBus(stack, "bus", {
@@ -6,6 +6,8 @@ export function API({ stack }: StackContext) {
       retries: 10,
     },
   });
+
+  const catPictures = new Bucket(stack, "cat-pictures")
 
   const api = new Api(stack, "api", {
     defaults: {
@@ -20,6 +22,7 @@ export function API({ stack }: StackContext) {
         bind: [bus],
         environment: {
           BASELIME_KEY: process.env.BASELIME_KEY || '',
+          CAT_PICTURES_BUCKET: catPictures.bucketName
         }
       },
     },

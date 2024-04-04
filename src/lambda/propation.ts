@@ -19,7 +19,13 @@ const snsGetter = {
 };
 
 
-export function extractContext(service: string, event: any): { parent?: Context, links?: Link[] } {
+export function extractContext(service: string, event: any, cb: (service: string, event: any) => { parent?: Context, links?: Link[]} | void | undefined): { parent?: Context, links?: Link[] } {
+    if (cb) {
+        const res =  cb(service, event);
+        if (res) {
+            return res;
+        }
+    }
     switch (service) {
         case "api":
         case "api-gateway":

@@ -7,13 +7,12 @@ const timeoutErrorMessage = `The Baselime OpenTelemetry SDK has detected that th
 export function setupTimeoutDetection(span: Span, lambda_context: Context, timeoutThreshold: number = 500) {
     const timeRemaining = lambda_context.getRemainingTimeInMillis();
     setTimeout(async () => {
-      const error = new Error(timeoutErrorMessage);
-      error.name = "Possible Lambda Timeout";
-      span.setAttributes(flatten({ error: { name: error.name, message: error.message } }));
-      span.recordException(error);
-      span.end();
-      await flushTraces();
-
+        const error = new Error(timeoutErrorMessage);
+        error.name = "Possible Lambda Timeout";
+        span.setAttributes(flatten({ error: { name: error.name, message: error.message } }));
+        span.recordException(error);
+        span.end();
+        await flushTraces();
     }, timeRemaining - (timeoutThreshold));
 }
 
@@ -34,10 +33,16 @@ export function trackColdstart() {
     }
 }
 
+export function captureError(span: Span, err: unknown) {
+    let error = typeof err === 'string' ? new Error(err) : err as Error;
+    span.recordException(error);
+    span.setAttributes(flatten({ error: { name: error.name, message: error.message, stack: error.stack } }));
+}
+
 export async function flushTraces() {
     try {
         // @ts-expect-error
         await trace.getTracerProvider().getDelegate().forceFlush();
-      } catch (_) {
-      }
+    } catch (_) {
+    }
 }

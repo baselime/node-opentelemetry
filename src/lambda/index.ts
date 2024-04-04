@@ -1,7 +1,7 @@
-import api, { trace, context, propagation } from "@opentelemetry/api";
+import { trace, Context as OtelContext, Link} from "@opentelemetry/api";
 import { Handler, Callback, Context } from "aws-lambda";
 import { flatten } from "flat"
-import { flushTraces, trackColdstart } from "./utils.ts";
+import { flushTraces, captureError, setupTimeoutDetection, trackColdstart } from "./utils.ts";
 import { parseInput } from "./parse-event.ts";
 import { extractContext, injectContextToResponse } from "./propation.ts";
 const tracer = trace.getTracer('@baselime/baselime-lambda-wrapper', '1');
@@ -11,7 +11,7 @@ type LambdaWrapperOptions = {
     captureEvent?: boolean | undefined
     captureResponse?: boolean | undefined
     timeoutThreshold?: number | undefined
-    determineParent?: (event: unknown, service: string) => { traceparent: string, tracestate?: string } | { traceparent: string, tracestate?: string }[] | undefined
+    extractContext?: (service: string, event: any) => { parent?: OtelContext, links?: Link[] } | void | undefined
 }
 
 const isColdstart = trackColdstart();
@@ -25,43 +25,42 @@ export function withOpenTelemetry(handler: Handler, opts: LambdaWrapperOptions =
     return async function (event: any, lambda_context: Context, callback?: Callback) {
 
         const { coldstart, proactiveInitialization } = isColdstart(opts.proactiveInitializationThreshold);
-    
-        
-        const { attributes, service } = parseInput(event, lambda_context, coldstart, proactiveInitialization);
 
-        const { links, parent } = extractContext(service, event);
+
+        const { attributes, service } = parseInput(event, lambda_context, coldstart, proactiveInitialization, opts.captureEvent);
+
+        const { links, parent } = extractContext(service, event, opts.extractContext);
 
         return tracer.startActiveSpan(lambda_context.functionName, { links, attributes }, parent, async (span) => {
-            
+            setupTimeoutDetection(span, lambda_context, opts.timeoutThreshold);
             try {
-                let result = await handler(event, lambda_context, (err, res) => {
-                    if (err) {
-                        let error = typeof err === 'string' ? new Error(err) : err;
-                        span.recordException(err);
-                        span.setAttributes(flatten({ error: { name: error.name, message: error.message, stack: error.stack } }));
-                    }
+                let result = await handler(event, lambda_context, async (err, res) => {
+                    if (err) { captureError(span, err) }
 
                     if (res) {
-                        span.setAttributes(flatten({ result: res }));
+                        if (opts.captureResponse) {
+                            span.setAttributes(flatten({ result: res }));
+                        }
                         injectContextToResponse(service, res, span);
                     }
                     if (callback) {
                         span.end();
-                        callback(err, res);
+                        await flushTraces();
+                        return callback(err, res);
                     }
                 });
                 if (result) {
-                    span.setAttributes(flatten({ result }));
+                    if (opts.captureResponse) {
+                        span.setAttributes(flatten({ result }));
+                    }
                     injectContextToResponse(service, result, span);
                 }
 
-                
+
                 return result;
             } catch (e) {
-                const err = e as Error;
-                span.recordException(err);
-                span.setAttributes(flatten({ error: { name: err.name, message: err.message, stack: err.stack } }));
-                throw err;
+                captureError(span, e);
+                throw e;
             } finally {
                 span.end();
                 await flushTraces();

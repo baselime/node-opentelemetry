@@ -5,7 +5,7 @@
 
 Instrument your Node.js applications with OpenTelemetry and send the traces to [Baselime](https://baselime.io).
 
-![](./traces.png)
+![A baselime trace diagram](./traces.png)
 
   
 ## Getting Started 
