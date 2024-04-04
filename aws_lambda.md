@@ -1,6 +1,6 @@
 # Tracing AWS Lambda Functions
 
-Manually Instrument your AWS Lambda Functions `withOpenTelemetry`. 
+Manually Instrument your AWS Lambda Functions using `withOpenTelemetry` wrapper.
 
 If you want to instrument your lambda function with no code changes please read the docs [here](https://baselime.io/docs/sending-data/platforms/aws/aws-lambda/traces/node.js/).
   
@@ -79,8 +79,27 @@ Finally add the `BASELIME_API_KEY` environment variable to send traces to your [
 
 ## Configuration Options
 
-The `withOpenTelemetry` middleware can be configured with the following options.
+The `withOpenTelemetry` takes a second argument, an object with the following properties.
 
+```javascript
+export const handler = withOpenTelemetry(async (e: APIGatewayProxyEventV2) => {
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ 
+      message: 'Hello from Lambda!',
+    })
+  };
+}, {
+  captureEvent: false,
+  captureResponse: false,
+  proactiveInitializationThreshold: 1000,
+  timeoutThreshold: 500,
+  extractContext(service, event) {
+    console.log('Extracting context', service, event);
+  }
+});
+```
 
 | Field                        | Type                                                                                              | Description                                                                                             |
 |------------------------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
