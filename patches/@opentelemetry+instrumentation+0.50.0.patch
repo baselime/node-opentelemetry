@@ -1,0 +1,13 @@
+diff --git a/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js b/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+index 3a717ca..d8e2404 100644
+--- a/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
++++ b/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+@@ -45,7 +45,7 @@ import { satisfies } from 'semver';
+ import { wrap, unwrap } from 'shimmer';
+ import { InstrumentationAbstract } from '../../instrumentation';
+ import { RequireInTheMiddleSingleton, } from './RequireInTheMiddleSingleton';
+-import * as ImportInTheMiddle from 'import-in-the-middle';
++import ImportInTheMiddle from 'import-in-the-middle';
+ import { diag } from '@opentelemetry/api';
+ import { Hook } from 'require-in-the-middle';
+ /**

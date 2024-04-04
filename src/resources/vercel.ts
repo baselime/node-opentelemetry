@@ -5,6 +5,9 @@ import {
 } from '@opentelemetry/resources';
 import {
     SemanticResourceAttributes,
+    SEMRESATTRS_CLOUD_PROVIDER,
+    SEMRESATTRS_CLOUD_REGION,
+    SEMRESATTRS_CLOUD_PLATFORM,
 } from '@opentelemetry/semantic-conventions';
 
 export class VercelDetector implements DetectorSync {
@@ -20,14 +23,26 @@ export class VercelDetector implements DetectorSync {
         }
 
        
+        const gitBranchUrl = String(process.env.VERCEL_BRANCH_URL);
+        let serviceName: string;
+        let serviceNamespace: string;
+
+        if(gitBranchUrl) {
+            try { 
+                serviceName = gitBranchUrl.split('-git-')[0]
+                serviceNamespace = serviceName;
+            } catch(e) {
+            }
+        }
+
         const attributes = {
-            [SemanticResourceAttributes.CLOUD_PROVIDER]: String(
+            [SEMRESATTRS_CLOUD_PROVIDER]: String(
                 'Vercel'
             ),
-            [SemanticResourceAttributes.CLOUD_PLATFORM]: String(
+            [SEMRESATTRS_CLOUD_PLATFORM]: String(
                 'Vercel Functions'
             ),
-            [SemanticResourceAttributes.CLOUD_REGION]: String(process.env.VERCEL_REGION),
+            [SEMRESATTRS_CLOUD_REGION]: String(process.env.VERCEL_REGION),
             'vercel.environment': String(process.env.VERCEL_ENV),
             'vercel.url': String(process.env.VERCEL_URL),
             'vercel.url.branch': String(process.env.VERCEL_BRANCH_URL),
@@ -36,18 +51,8 @@ export class VercelDetector implements DetectorSync {
             'vercel.git.commit': String(process.env.VERCEL_GIT_COMMIT_SHA),
             'vercel.git.message': String(process.env.VERCEL_GIT_COMMIT_MESSAGE),
             'vercel.git.author': String(process.env.VERCEL_GIT_COMMIT_AUTHOR_NAME),
-            
-        }
-
-        const gitBranchUrl = String(process.env.VERCEL_BRANCH_URL);
-        
-        if(gitBranchUrl) {
-            try { 
-                let serviceName = gitBranchUrl.split('-git-')[0]
-                attributes['service.name'] = serviceName;
-                attributes['service.namespace'] = serviceName;
-            } catch(e) {
-            }
+            'service.name': serviceName,
+            'service.namespace': serviceNamespace,
         }
 
         return new Resource(attributes);
