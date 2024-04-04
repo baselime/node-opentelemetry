@@ -57,7 +57,7 @@ new BaselimeSDK({
     ]
 }).start();
 ```
-import this file at the top of each of your lambda functions
+import `tracing.js` at the top of your lambda entry file"
 
 ```javascript
 import './tracing.js'
@@ -80,6 +80,7 @@ Finally add the `BASELIME_API_KEY` environment variable to send traces to your [
 ## Configuration Options
 
 The `withOpenTelemetry` middleware can be configured with the following options.
+
 
 | Field                        | Type                                                                                              | Description                                                                                             |
 |------------------------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
