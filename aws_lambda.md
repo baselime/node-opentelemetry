@@ -34,9 +34,7 @@ export const handler = withOpenTelemetry(async () => {
 
 There are 2 ways to add the Baselime SDK to your lambda function.
 
-### Trac
-
-ing tag
+### Tracing tag
 
 To automatically add the Baselime SDK and Baselime zero latency lambda extension add the `baselime:tracing` tag with the value `manual`
 
