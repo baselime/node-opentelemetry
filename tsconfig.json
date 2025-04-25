@@ -1,15 +1,14 @@
 {
     "compilerOptions": {
-        "module": "nodenext",
         "allowImportingTsExtensions": true,
         "noEmit": true,
         "declaration": true,
-        "moduleResolution": "nodenext",
+        "module": "commonjs",
+        "moduleResolution": "node",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
-        
     },
     "include": [
         "src/**/*"

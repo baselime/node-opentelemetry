@@ -1,22 +1,15 @@
 {
-  "name": "@baselime/node-opentelemetry",
-  "version": "0.5.8",
+  "name": "@sumup/node-opentelemetry",
+  "version": "0.5.8-14",
   "description": "Instrument node.js applications with open telemetry ",
-  "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
-    },
-    "./lambda": {
-      "types": "./dist/lambda.d.cts",
-      "default": "./dist/lambda.cjs"
-    },
-    "./trpc": {
-      "types": "./dist/trpc.d.cts",
-      "default": "./dist/trpc.cjs"
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
     }
   },
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
   "files": [
     "dist"
   ],
@@ -39,7 +32,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/baselime/node-opentelemetry.git"
+    "url": "git+https://github.com/sumup/node-opentelemetry.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "baselime",
@@ -51,9 +47,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/baselime/node-opentelemetry/issues"
+    "url": "https://github.com/sumup/node-opentelemetry/issues"
   },
-  "homepage": "https://github.com/baselime/node-opentelemetry#readme",
+  "homepage": "https://github.com/sumup/node-opentelemetry#readme",
   "peerDependencies": {
     "@trpc/server": "^10.0.0 || ^11.0.0"
   },

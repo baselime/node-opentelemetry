@@ -8,18 +8,19 @@ import { InstrumentationOption, registerInstrumentations } from '@opentelemetry/
 import { existsSync } from 'fs';
 import { ServiceDetector } from './resources/service.ts';
 import { KoyebDetector } from './resources/koyeb.ts';
+import { AttributeValue } from "@opentelemetry/api/build/src/common/Attributes";
 
 type BaselimeSDKOpts = {
     instrumentations?: InstrumentationOption[],
     collectorUrl?: string,
-    baselimeKey?: string,
+    basicAuthHeader?: string,
     service?: string,
     log?: boolean,
     namespace?: string,
     serverless?: boolean
     sampler?: Sampler
     resourceDetectors?: DetectorSync[],
-    resourceAttributes?: Resource | Attributes
+    resourceAttributes?: Resource | Attributes | { key: string, value: AttributeValue }[]
 }
 
 
@@ -41,7 +42,6 @@ export class BaselimeSDK {
     constructor(options: BaselimeSDKOpts) {
         options.serverless = options.serverless || false;
         options.collectorUrl = options.collectorUrl || process.env.COLLECTOR_URL || "https://otel.baselime.io/v1";
-        options.baselimeKey = options.baselimeKey || process.env.BASELIME_API_KEY || process.env.BASELIME_KEY
         
         this.options = options;
     }
@@ -64,19 +64,17 @@ export class BaselimeSDK {
             forceFlushTimeoutMillis: 5000,
         });
 
-
-
         // configure exporters
 
         let exporter: OTLPTraceExporter | ConsoleSpanExporter | undefined = undefined;
 
-        if(!this.options.baselimeKey) {
-            console.warn("No Baselime API key provided. Traces will not be sent to Baselime.")
+        if(!this.options.basicAuthHeader) {
+            console.warn("No auth header provided, not sending traces!");
         }
         
-        
-        if (this.options.baselimeKey) {
+        if (this.options.basicAuthHeader) {
             let collectorUrl = this.options.collectorUrl;
+            console.log("Collector URL: ", collectorUrl);
 
             // If the baselime extension is running, we need to use the sandbox collector.
             if (existsSync('/opt/extensions/baselime')) {
@@ -86,7 +84,7 @@ export class BaselimeSDK {
             exporter = new OTLPTraceExporter({
                 url: collectorUrl,
                 headers: {
-                    "x-api-key": this.options.baselimeKey || process.env.BASELIME_KEY || process.env.BASELIME_OTEL_KEY,
+                    'Authorization': `Basic ${this.options.basicAuthHeader}`
                 },
                 timeoutMillis: 1000,
             });

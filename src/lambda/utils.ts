@@ -36,7 +36,10 @@ export function trackColdstart() {
 export function captureError(span: Span, err: unknown) {
     let error = typeof err === 'string' ? new Error(err) : err as Error;
     span.recordException(error);
-    span.setAttributes(flatten({ error: { name: error.name, message: error.message, stack: error.stack } }));
+    span.setAttributes({
+        ...flatten({error: {name: error.name, message: error.message, stack: error.stack}}),
+        error: true // required to make honeycomb mark the span as an error
+    });
 }
 
 export async function flushTraces() {
